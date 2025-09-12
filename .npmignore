@@ -1,0 +1,33 @@
+# Source
+src/
+tests/
+__tests__/
+coverage/
+.nyc_output/
+
+# Config files
+.eslintrc*
+.prettierrc*
+.editorconfig
+.travis.yml
+.github/
+.husky/
+rollup.config.js
+jest.config.js
+tsconfig.json
+
+# Dev tools
+.idea/
+.vscode/
+.gitlab/
+.travis/
+
+# Logs
+logs/
+*.log
+
+# Misc
+.DS_Store
+Thumbs.db
+*.tgz
+.env*
