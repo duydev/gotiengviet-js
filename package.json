@@ -1,5 +1,6 @@
 {
   "name": "gotiengviet",
+  "type": "module",
   "version": "1.0.0",
   "description": "Add Vietnamese typing to your web app. Supports Telex, VNI, VIQR input methods",
   "main": "dist/index.js",
