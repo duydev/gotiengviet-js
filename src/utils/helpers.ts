@@ -36,13 +36,17 @@ export function replaceText(
   startPos: number,
   endPos: number,
 ): void {
-  const beforeLength = element.value.length;
+  // Save scroll state for restoration (inspired by avim.js approach)
+  const savedScrollTop = element.scrollTop || 0;
+
+  // Perform text replacement
   element.value =
     element.value.slice(0, startPos) + newText + element.value.slice(endPos);
 
-  const afterLength = element.value.length;
-  const delta = afterLength - beforeLength;
+  // Set cursor position at the end of the replaced text
+  const newCursorPos = startPos + newText.length;
+  element.selectionStart = element.selectionEnd = newCursorPos;
 
-  // Update cursor position
-  element.selectionStart = element.selectionEnd = startPos + delta;
+  // Restore scroll state (improvement from avim.js)
+  element.scrollTop = savedScrollTop;
 }

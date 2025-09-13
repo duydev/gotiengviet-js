@@ -76,8 +76,8 @@ describe('replaceText', () => {
     input.selectionStart = input.selectionEnd = 8;
     replaceText(input, 'bạn', 8, 11);
     expect(input.value).toBe('Xin chaobạnc ban');
-    expect(input.selectionStart).toBe(8);
-    expect(input.selectionEnd).toBe(8);
+    expect(input.selectionStart).toBe(11); // Cursor at end of replaced text
+    expect(input.selectionEnd).toBe(11);
   });
   it('works with textarea', () => {
     const textarea = document.createElement('textarea');

@@ -73,16 +73,20 @@ export class VietnameseInput {
     const cursorPos = target.selectionStart || value.length;
 
     const lastWord = getLastWord(value, cursorPos);
-
     if (lastWord.length < 2) return;
-
     const method = INPUT_METHODS[this.config.inputMethod || 'telex'];
     const processed = this.processInput(lastWord, method);
-
     if (processed !== lastWord) {
+      // Xác định vị trí bắt đầu và kết thúc của từ cuối cùng
       const startPos = cursorPos - lastWord.length;
-      replaceText(target, processed, startPos, cursorPos);
+      const endPos = cursorPos;
+      // Tạo giá trị mới cho toàn bộ input
+      const newValue =
+        value.slice(0, startPos) + processed + value.slice(endPos);
+      // Đặt lại vị trí con trỏ sau từ vừa thay thế
+      const newCursor = startPos + processed.length;
       event.preventDefault();
+      replaceText(target, newValue, newCursor, newCursor);
     }
   }
 
@@ -90,6 +94,14 @@ export class VietnameseInput {
     // Marking rules (aa -> â, aw -> ă, etc.)
     for (const [key, result] of Object.entries(method.markRules)) {
       if (text.toLowerCase().endsWith(key.toLowerCase())) {
+        const before = text.slice(0, -key.length);
+        // Nếu đã là ký tự mark, gõ lại key sẽ undo về ký tự gốc
+        if (before.endsWith(result)) {
+          // Undo: trả lại ký tự gốc (key)
+          return before + key;
+        }
+        // Nếu phía trước là key mark/tone giống key, không thay thế (giữ nguyên)
+        if (before.endsWith(key)) return text;
         const base = text.slice(0, -key.length);
         return base + result;
       }
@@ -98,8 +110,16 @@ export class VietnameseInput {
     // Tone rules (s -> sắc, f -> huyền, etc.)
     const lastChar = text.slice(-1);
     if (lastChar in method.toneRules) {
-      const tone = method.toneRules[lastChar];
+      // Luôn cho phép gõ lặp key tone: nếu phía trước là ký tự tone giống lastChar, không thay thế
+      if (text.slice(-2, -1) === lastChar) return text;
+      // Chỉ áp dụng tone nếu có nguyên âm hợp lệ
       const base = text.slice(0, -1);
+      const vowelPositions = findVowelPosition(base);
+      if (vowelPositions.length === 0) {
+        // Không có nguyên âm, không áp dụng tone, trả về text gốc (cho phép nhập r/f/s...)
+        return text;
+      }
+      const tone = method.toneRules[lastChar];
       return this.applyTone(base, tone);
     }
 

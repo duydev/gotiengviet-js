@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gotiengviet-js Example</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    input, textarea { width: 100%; font-size: 1.2rem; margin: 1rem 0; padding: 0.5rem; }
+    .note { color: #888; font-size: 0.95rem; }
+    .controls { background: #f5f5f5; padding: 1rem; margin: 1rem 0; border-radius: 8px; border: 1px solid #ddd; }
+    .control-group { margin-bottom: 1rem; }
+    .control-group:last-child { margin-bottom: 0; }
+    .control-label { font-weight: bold; margin-bottom: 0.5rem; display: block; }
+    .toggle-btn { 
+      background: #007bff; color: white; border: none; padding: 0.5rem 1rem; 
+      border-radius: 4px; cursor: pointer; font-size: 0.9rem; 
+    }
+    .toggle-btn.disabled { background: #6c757d; }
+    .toggle-btn:hover { opacity: 0.8; }
+    .radio-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .radio-option { display: flex; align-items: center; gap: 0.25rem; }
+    .status { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+    .status.enabled { background: #d4edda; color: #155724; }
+    .status.disabled { background: #f8d7da; color: #721c24; }
+    .footer { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 0.9rem; }
+    .footer a { color: #007bff; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>gotiengviet-js Example</h1>
+  
+  <div class="controls">
+    <div class="control-group">
+      <label class="control-label">Status:</label>
+      <button id="toggle-btn" class="toggle-btn">Disable Vietnamese</button>
+      <span id="status-indicator" class="status enabled">Enabled</span>
+    </div>
+    
+    <div class="control-group">
+      <label class="control-label">Input Method:</label>
+      <div class="radio-group">
+        <div class="radio-option">
+          <input type="radio" id="telex" name="inputMethod" value="telex" checked>
+          <label for="telex">Telex</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="vni" name="inputMethod" value="vni">
+          <label for="vni">VNI</label>
+        </div>
+        <div class="radio-option">
+          <input type="radio" id="viqr" name="inputMethod" value="viqr">
+          <label for="viqr">VIQR</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">Type Vietnamese using Telex, VNI, VIQR methods in the input or textarea below.<br>
+    (Example: "tieengs vieetj" → "tiếng việt")
+  </div>
+  <input id="demo-input" placeholder="Try typing here..." />
+  <textarea id="demo-textarea" rows="4" placeholder="Or here..."></textarea>
+  <script type="module">
+    import { VietnameseInput } from '../dist/index.esm.js';
+    
+    // Initialize Vietnamese input
+    const vi = VietnameseInput.getInstance({ enabled: true, inputMethod: 'telex' });
+    
+    // Get control elements
+    const toggleBtn = document.getElementById('toggle-btn');
+    const statusIndicator = document.getElementById('status-indicator');
+    const inputMethodRadios = document.querySelectorAll('input[name="inputMethod"]');
+    
+    // Update UI based on current state
+    function updateUI() {
+      const isEnabled = vi.isEnabled();
+      const currentMethod = vi.getInputMethod();
+      
+      // Update toggle button
+      toggleBtn.textContent = isEnabled ? 'Disable Vietnamese Typing' : 'Enable Vietnamese Typing';
+      toggleBtn.className = isEnabled ? 'toggle-btn' : 'toggle-btn disabled';
+      
+      // Update status indicator
+      statusIndicator.textContent = isEnabled ? 'Enabled' : 'Disabled';
+      statusIndicator.className = isEnabled ? 'status enabled' : 'status disabled';
+      
+      // Update radio buttons
+      inputMethodRadios.forEach(radio => {
+        radio.checked = radio.value === currentMethod;
+      });
+    }
+    
+    // Toggle enable/disable
+    toggleBtn.addEventListener('click', () => {
+      vi.toggle();
+      updateUI();
+    });
+    
+    // Handle input method change
+    inputMethodRadios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          vi.setInputMethod(e.target.value);
+          updateUI();
+        }
+      });
+    });
+    
+    // Initial UI update
+    updateUI();
+  </script>
+  
+  <footer class="footer">
+    <p>&copy; 2025 gotiengviet-js - <a href="https://github.com/duydev" target="_blank">Trần Nhật Duy</a> - <a href="https://github.com/duydev/gotiengviet-js" target="_blank">GitHub</a></p>
+  </footer>
+</body>
+</html>

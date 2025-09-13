@@ -15,7 +15,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "serve": "npx serve ."
   },
   "repository": {
     "type": "git",

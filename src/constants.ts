@@ -31,10 +31,6 @@ export const VIETNAMESE_CHARS = {
 export const DEFAULT_CONFIG = {
   enabled: true,
   inputMethod: 'telex' as const,
-  autoRestoreNonViet: true,
-  useModernStyle: true,
-  freeMarking: false,
-  excludeSelectors: [],
 };
 
 export const INPUT_METHODS: Record<string, InputMethodRule> = {
