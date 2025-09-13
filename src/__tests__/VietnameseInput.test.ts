@@ -131,6 +131,23 @@ describe('VietnameseInput internal logic (coverage)', () => {
     expect(vi['applyTone']('bAn', 2)).toBe('bàn'); // 'A' có trong VIETNAMESE_CHARS
   });
 
+  it('markRules: Dd and DD should produce uppercase Đ', () => {
+    // processInput is aware of markRules and should handle dd/ DD sequences
+    expect(vi['processInput']('Dd', INPUT_METHODS.telex)).toBe('Đ');
+    expect(vi['processInput']('DD', INPUT_METHODS.telex)).toBe('Đ');
+  });
+
+  // Known failing cases documented as tests
+  it('known issue: MIFNH should become MÌNH (currently fails)', () => {
+    // User types: M I F N H -> expects MÌNH
+    expect(vi['processInput']('MIFNH', INPUT_METHODS.telex)).toBe('MÌNH');
+  });
+
+  it('known issue: huowng should become hương and HUOWNG -> HƯƠNG (currently fails)', () => {
+    expect(vi['processInput']('huowng', INPUT_METHODS.telex)).toBe('hương');
+    expect(vi['processInput']('HUOWNG', INPUT_METHODS.telex)).toBe('HƯƠNG');
+  });
+
   it('destroy removes listeners', () => {
     const spy1 = jest.spyOn(document, 'removeEventListener');
     vi.destroy();

@@ -39,14 +39,40 @@ export function replaceText(
   // Save scroll state for restoration (inspired by avim.js approach)
   const savedScrollTop = element.scrollTop || 0;
 
-  // Perform text replacement
-  element.value =
-    element.value.slice(0, startPos) + newText + element.value.slice(endPos);
+  // If supported, use setRangeText which preserves other selection behavior
+  // and is more efficient than manual string splicing.
+  interface HasSetRangeText {
+    setRangeText(
+      replacement: string,
+      start: number,
+      end: number,
+      selectionMode?: 'preserve' | 'select' | 'end',
+    ): void;
+  }
 
-  // Set cursor position at the end of the replaced text
-  const newCursorPos = startPos + newText.length;
-  element.selectionStart = element.selectionEnd = newCursorPos;
+  if (
+    'setRangeText' in element &&
+    typeof (element as unknown as HasSetRangeText).setRangeText === 'function'
+  ) {
+    // setRangeText(replacement, start, end, selectionMode)
+    // selectionMode 'end' moves the caret to the end of the replaced text.
+    (element as unknown as HasSetRangeText).setRangeText(
+      newText,
+      startPos,
+      endPos,
+      'end',
+    );
+    // Ensure selection reflects caret at end of inserted text
+    const newCursorPos = startPos + newText.length;
+    element.selectionStart = element.selectionEnd = newCursorPos;
+  } else {
+    // Fallback
+    element.value =
+      element.value.slice(0, startPos) + newText + element.value.slice(endPos);
+    const newCursorPos = startPos + newText.length;
+    element.selectionStart = element.selectionEnd = newCursorPos;
+  }
 
-  // Restore scroll state (improvement from avim.js)
+  // Restore scroll state
   element.scrollTop = savedScrollTop;
 }
