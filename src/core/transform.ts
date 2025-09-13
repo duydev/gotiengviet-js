@@ -27,11 +27,13 @@ export function processInputByMethod(
       const after = working.slice(idx + 1);
       const base = before + after;
       const vowelPositions = findVowelPosition(base);
+      // Choose a vowel to the left of the tone key. If there's no vowel to the left
+      // (e.g. tone-like letter at the start of the word like "x" in "xi"), skip
+      // tone application. This prevents accidental transformation such as "xi" -> "ĩ".
       let chosenPos = -1;
       for (const vp of vowelPositions) if (vp < idx) chosenPos = vp;
-      if (chosenPos === -1 && vowelPositions.length > 0)
-        chosenPos = vowelPositions[vowelPositions.length - 1];
       if (chosenPos === -1) {
+        // No vowel to the left — do not apply tone
         idx++;
         continue;
       }

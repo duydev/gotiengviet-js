@@ -16,4 +16,10 @@ describe('processInputByMethod (basic)', () => {
     const out = processInputByMethod(input, method);
     expect(out).toBe('á');
   });
+
+  test('does not apply tone when tone key follows consonant only (xi -> xi)', () => {
+    const method = INPUT_METHODS.telex;
+    expect(processInputByMethod('xi', method)).toBe('xi');
+    expect(processInputByMethod('Xi', method)).toBe('Xi');
+  });
 });
