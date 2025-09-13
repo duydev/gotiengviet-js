@@ -1,6 +1,8 @@
-import { InputMethodRule, InputConfig, InputMethod } from '../types';
-import { INPUT_METHODS, VIETNAMESE_CHARS } from '../constants';
-import { getLastWord, findVowelPosition, replaceText } from '../utils/helpers';
+import { InputConfig, InputMethod, InputMethodRule } from '../types';
+import { INPUT_METHODS } from '../constants';
+import { getLastWord, replaceText } from '../utils';
+import { processInputByMethod } from './transform';
+import { applyToneToText } from './transform';
 
 export class VietnameseInput {
   /**
@@ -16,6 +18,16 @@ export class VietnameseInput {
       VietnameseInput._instance = new VietnameseInput(config);
     }
     return VietnameseInput._instance;
+  }
+
+  // Backwards-compatible accessors for tests and callers that relied on internal methods.
+  // These delegate to the pure transform functions.
+  public processInput(text: string, method: InputMethodRule): string {
+    return processInputByMethod(text, method);
+  }
+
+  public applyTone(text: string, toneIndex: number): string {
+    return applyToneToText(text, toneIndex);
   }
   private config: InputConfig;
   private enabled: boolean;
@@ -76,7 +88,7 @@ export class VietnameseInput {
     // keep previous behavior: only attempt when last word has at least 2 chars
     if (lastWord.length < 2) return;
     const method = INPUT_METHODS[this.config.inputMethod || 'telex'];
-    const processed = this.processInput(lastWord, method);
+    const processed = processInputByMethod(lastWord, method);
     if (processed !== lastWord) {
       // start and end positions of the last word
       const startPos = cursorPos - lastWord.length;
@@ -85,179 +97,6 @@ export class VietnameseInput {
       event.preventDefault();
       replaceText(target, processed, startPos, endPos);
     }
-  }
-
-  private processInput(text: string, method: InputMethodRule): string {
-    // First, process tone keys that may appear anywhere (case-insensitive),
-    // e.g., user types F then N H -> we should still apply tone to earlier vowel.
-    let idx = 0;
-    while (idx < text.length) {
-      const ch = text[idx];
-      const lowerCh = ch.toLowerCase();
-      const toneIndex = method.toneRules[lowerCh];
-      if (toneIndex !== undefined) {
-        // Prevent double-tone typing (same key repeated immediately)
-        if (idx > 0 && text[idx - 1].toLowerCase() === lowerCh) {
-          idx++;
-          continue;
-        }
-        // Remove tone char from text
-        const before = text.slice(0, idx);
-        const after = text.slice(idx + 1);
-        const base = before + after;
-        // Find vowel positions in base and choose the vowel to the left of original tone position if possible
-        const vowelPositions = findVowelPosition(base);
-        let chosenPos = -1;
-        for (const vp of vowelPositions) {
-          if (vp < idx) chosenPos = vp;
-        }
-        if (chosenPos === -1 && vowelPositions.length > 0) {
-          chosenPos = vowelPositions[vowelPositions.length - 1];
-        }
-        if (chosenPos === -1) {
-          idx++;
-          continue;
-        }
-        // Apply tone; preserve case by passing base to applyTone which already handles case
-        const toned = this.applyTone(base, toneIndex);
-        text = toned;
-        // restart scanning from beginning to handle multiple tone chars
-        idx = 0;
-        continue;
-      }
-      idx++;
-    }
-
-    // Then apply markRules anywhere inside the word (not only suffix).
-    // We iterate replacing occurrences until no change; prefer exact-case matches first.
-    let changed = true;
-    const markKeys = Object.keys(method.markRules).sort(
-      (a, b) => b.length - a.length,
-    );
-    while (changed) {
-      changed = false;
-      for (const key of markKeys) {
-        const result = method.markRules[key as keyof typeof method.markRules];
-        const idxExact = text.lastIndexOf(key);
-        if (idxExact !== -1) {
-          const before = text.slice(0, idxExact);
-          const after = text.slice(idxExact + key.length);
-          if (before.endsWith(result)) {
-            text = before + key + after;
-          } else {
-            text = before + result + after;
-          }
-          changed = true;
-          break;
-        }
-        const lowerKey = key.toLowerCase();
-        const lowerText = text.toLowerCase();
-        const idxLower = lowerText.lastIndexOf(lowerKey);
-        if (idxLower !== -1) {
-          const before = text.slice(0, idxLower);
-          const after = text.slice(idxLower + key.length);
-          const segment = text.substr(idxLower, key.length);
-          const suggestsUpper = segment[0] === segment[0].toUpperCase();
-          let mapped = result;
-          const alt = method.markRules[key.toUpperCase()];
-          if (suggestsUpper && alt) mapped = alt;
-          if (before.endsWith(mapped)) {
-            text = before + segment + after;
-          } else {
-            text = before + mapped + after;
-          }
-          changed = true;
-          break;
-        }
-      }
-    }
-
-    // Post-processing: in cases like 'u' + 'ơ' -> should normalize to 'ươ' (and uppercase variants)
-    // handle lowercase
-    text = text.replace(/uơ/g, 'ươ');
-    // uppercase
-    text = text.replace(/UƠ/g, 'ƯƠ');
-
-    return text;
-  }
-
-  private applyTone(text: string, toneIndex: number): string {
-    const vowelPositions = findVowelPosition(text);
-    if (vowelPositions.length === 0) return text;
-
-    // Choose which vowel should receive the tone using a priority list.
-    // This approximates Vietnamese orthography: prefer 'a' variants, then 'o' variants, then 'e', then 'u', then 'i'/'y'.
-    const priority = [
-      'a',
-      'ă',
-      'â',
-      'o',
-      'ô',
-      'ơ',
-      'e',
-      'ê',
-      'u',
-      'ư',
-      'i',
-      'y',
-      'A',
-      'Ă',
-      'Â',
-      'O',
-      'Ô',
-      'Ơ',
-      'E',
-      'Ê',
-      'U',
-      'Ư',
-      'I',
-      'Y',
-    ];
-
-    // Helper: find mapping array for a character. When the whole word is not uppercase prefer lowercase mapping
-    const isAllUpper = text === text.toUpperCase();
-    const findMappingForChar = (ch: string) => {
-      const lower = ch.toLowerCase();
-      if (!isAllUpper && lower in VIETNAMESE_CHARS) {
-        return VIETNAMESE_CHARS[lower as keyof typeof VIETNAMESE_CHARS];
-      }
-      // fallback: return any mapping that contains this char
-      for (const key of Object.keys(VIETNAMESE_CHARS) as Array<
-        keyof typeof VIETNAMESE_CHARS
-      >) {
-        const arr = VIETNAMESE_CHARS[key];
-        if (arr.indexOf(ch) !== -1) return arr;
-      }
-      return null;
-    };
-
-    // Evaluate candidate vowel positions and pick the one with highest priority
-    let chosenPos = vowelPositions[vowelPositions.length - 1]; // fallback: last
-    let bestRank = Number.MAX_SAFE_INTEGER;
-    for (const p of vowelPositions) {
-      const ch = text[p];
-      const mapping = findMappingForChar(ch);
-      if (!mapping) continue;
-      // determine base key (the mapping's index 0 lowercased)
-      const base = mapping[0];
-      const rank =
-        priority.indexOf(base) !== -1
-          ? priority.indexOf(base)
-          : Number.MAX_SAFE_INTEGER;
-      // Prefer lower rank; on tie prefer the later vowel (higher position)
-      if (rank < bestRank || (rank === bestRank && p > chosenPos)) {
-        bestRank = rank;
-        chosenPos = p;
-      }
-    }
-
-    const vowel = text[chosenPos];
-    const arr = findMappingForChar(vowel);
-    if (!arr) return text;
-    // toneIndex 0 means remove tone (restore base), arrays are ordered with base at index 0
-    const idx = Math.max(0, Math.min(toneIndex, arr.length - 1));
-    const tonedVowel = arr[idx] || arr[0];
-    return text.slice(0, chosenPos) + tonedVowel + text.slice(chosenPos + 1);
   }
 
   /**
