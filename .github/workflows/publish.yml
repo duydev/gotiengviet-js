@@ -6,10 +6,6 @@ on:
       - 'v*.*.*'
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -33,16 +29,15 @@ jobs:
       - name: Verify npm authentication
         run: |
           if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::error::NPM_TOKEN secret chưa được cấu hình."
-            echo "Tạo Automation token tại https://www.npmjs.com/settings/duydev/tokens"
-            echo "rồi thêm vào GitHub: Settings → Secrets → NPM_TOKEN"
+            echo "::error::Secret NPM_TOKEN chưa được cấu hình trong GitHub repo Settings → Secrets → Actions."
             exit 1
           fi
+          echo "NPM_TOKEN detected (${#NODE_AUTH_TOKEN} chars)"
           npm whoami
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish package
-        run: npm publish --provenance --access public
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
