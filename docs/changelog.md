@@ -7,6 +7,8 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-08
+
 ### Fixed
 
 - Pipeline transform: mark → normalize → tone (sửa `tieengs`→`tiếng`, `nguoiwf`→`người`, `basz`→`ba`).
@@ -14,6 +16,7 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - VIQR: `a^`→`â`, tone trước vowel (`b'a`→`bá`), thêm mark `ee`→`ê`.
 - VNI: `dd1`→`đá`, `ee`→`ê`, `ba10`→`bá0`.
 - Guard mark khi tone key ngay sau (`baas`→`baá`), skip tone lặp trên vowel đã dấu (`ass`→`ás`).
+- CI: thêm `jest-util@29` để ts-jest resolve peer dependency trên Node 18+ runners.
 
 ### Added
 
@@ -25,7 +28,7 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Integration test: `shouldRestoreNonViet` (email, URL, biến) trong `handleInput`.
 - Test regression mark revert loop (`âaa`).
 - Tài liệu `docs/test-scenarios.md` — catalog đầy đủ kịch bản test.
-- Mở rộng test suite: 34 → 124 test cases; coverage ~96% statements / ~82% branches.
+- Mở rộng test suite: 34 → 130 test cases; coverage ~96% statements / ~82% branches.
 - Tài liệu `docs/business-flows.md` — 11 luồng nghiệp vụ kèm Mermaid.
 - `.editorconfig`, `.gitattributes`, `.prettierignore`, `lint-staged`, scripts `lint:fix`, `format:check`.
 
@@ -34,7 +37,7 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `handleInput` gọi `shouldRestoreNonViet` — kích hoạt phát hiện email/URL/biến.
 - `transform.ts`: guard vòng lặp vô hạn mark revert; cache sorted mark keys; hoist `TONE_VOWEL_PRIORITY`.
 - `prepare` chỉ chạy `husky install` (bỏ build mỗi `npm install`).
-- Gỡ pin `jest-util` lệch major Jest 29.
+- CI matrix: Node 18.x, 20.x, 22.x; `engines.node` nâng lên `>=18.0.0`.
 - `.npmignore`: bỏ mục lỗi thời.
 - CI: nâng `actions/checkout` và `setup-node` lên v4.
 - Prettier `endOfLine: "lf"`; ESLint `browser` env và rules mới.
