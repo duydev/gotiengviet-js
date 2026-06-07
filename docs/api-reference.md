@@ -3,8 +3,42 @@
 ## Exports
 
 ```typescript
-import { VietnameseInput } from 'gotiengviet';
+import {
+  VietnameseInput,
+  processInputByMethod,
+  applyToneToText,
+} from 'gotiengviet';
 import type { InputConfig, InputMethod } from 'gotiengviet';
+```
+
+| Export | Loại | Mô tả |
+|--------|------|-------|
+| `VietnameseInput` | Class | Singleton gắn DOM events |
+| `processInputByMethod` | Function | Transform chuỗi theo bộ gõ (headless) |
+| `applyToneToText` | Function | Gán dấu thanh trực tiếp (headless) |
+| `InputConfig`, `InputMethod` | Types | Cấu hình và bộ gõ |
+
+---
+
+## Pure functions (headless)
+
+Dùng khi không cần DOM — CLI, server, test ngoài browser:
+
+### `processInputByMethod(text, method): string`
+
+Áp dụng quy tắc bộ gõ (tone + mark) lên chuỗi. `method` lấy từ `INPUT_METHODS` nội bộ hoặc object tương thích `InputMethodRule`.
+
+```typescript
+import { processInputByMethod } from 'gotiengviet';
+// Cần import constants nội bộ nếu dùng trực tiếp — hoặc truyền rule tùy chỉnh
+```
+
+### `applyToneToText(text, toneIndex): string`
+
+Gán dấu thanh (0–5) lên nguyên âm theo priority tiếng Việt.
+
+```typescript
+applyToneToText('hoa', 1); // 'hoá'
 ```
 
 ---

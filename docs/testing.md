@@ -88,13 +88,13 @@ describe('processInputByMethod', () => {
 - Trường hợp không đổi (no-op)
 - Hành vi thực tế vs kỳ vọng lý tưởng (document known limitations)
 
-### Bảng test hiện tại (120 cases)
+### Bảng test hiện tại (125 cases)
 
 | File | Số test | Phạm vi chính |
 |------|---------|---------------|
-| `transform.test.ts` | 82 | `applyToneToText`, Telex/VNI/VIQR marks & tones, edge cases |
-| `utils.test.ts` | 15 | `getLastWord`, `findVowelPosition`, `replaceText` (+ fallback) |
-| `VietnameseInput.test.ts` | 22 | Singleton, config, DOM `handleInput` (3 bộ gõ) |
+| `transform.test.ts` | 83 | `applyToneToText`, Telex/VNI/VIQR marks & tones, edge cases |
+| `utils.test.ts` | 16 | `getLastWord`, `findVowelPosition`, `shouldRestoreNonViet`, `replaceText` |
+| `VietnameseInput.test.ts` | 25 | Singleton, config, DOM `handleInput`, skip email/URL/code |
 | `utilsIndex.test.ts` | 1 | Re-export smoke |
 
 Chi tiết từng kịch bản (input, expected, mục đích): **[test-scenarios.md](./test-scenarios.md)**.
@@ -162,10 +162,16 @@ input.dispatchEvent(new Event('input', { bubbles: true }));
 
 ## Quality gate
 
-Trước khi merge PR, CI chạy:
+Trước khi merge, CI chạy (trên `main`, `develop`, `release/**`):
 
 ```
-npm ci → lint → build → test
+npm ci → format:check → lint → build → test
+```
+
+Local quality gate:
+
+```bash
+npm run quality-gate
 ```
 
 PR cần:

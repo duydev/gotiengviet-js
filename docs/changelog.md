@@ -9,21 +9,27 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Tài liệu `docs/test-scenarios.md` — catalog đầy đủ 120 kịch bản test (input, expected, mục đích, known limitations).
-- Mở rộng test suite: 34 → 120 test cases; coverage ~96% statements / ~82% branches.
-- Test `transform.test.ts`: Telex/VNI/VIQR đầy đủ, `applyToneToText`, edge cases và known limitations.
-- Test `utils.test.ts`: fallback `replaceText`, khôi phục `scrollTop`.
-- Test `VietnameseInput.test.ts`: default config, VNI/VIQR integration, `selectionStart` null.
-- Tài liệu `docs/business-flows.md` — 11 luồng nghiệp vụ chi tiết kèm sơ đồ Mermaid (tích hợp, gõ runtime, transform, GitFlow, CI/CD).
-- `.editorconfig`, `.gitattributes`, `.prettierignore` — chuẩn hóa LF line endings.
-- `lint-staged` config trong `package.json` — pre-commit tự lint + format.
-- Scripts `lint:fix`, `format:check`.
+- Export công khai `processInputByMethod`, `applyToneToText` (headless transform).
+- Script `npm run quality-gate` — format:check → lint → test → build.
+- CI chạy trên `develop` và `release/**`; thêm bước `format:check`.
+- Integration test: `shouldRestoreNonViet` (email, URL, biến) trong `handleInput`.
+- Test regression mark revert loop (`âaa`).
+- Tài liệu `docs/test-scenarios.md` — catalog đầy đủ kịch bản test.
+- Mở rộng test suite: 34 → 124 test cases; coverage ~96% statements / ~82% branches.
+- Tài liệu `docs/business-flows.md` — 11 luồng nghiệp vụ kèm Mermaid.
+- `.editorconfig`, `.gitattributes`, `.prettierignore`, `lint-staged`, scripts `lint:fix`, `format:check`.
 
 ### Changed
 
-- Prettier: thêm `endOfLine: "lf"` — sửa 826 lỗi CRLF trên Windows.
-- ESLint: thêm `browser` env, `parserOptions`, rules `no-unused-vars` (`^_`), scope `src/**/*.ts`.
-- Chuẩn hóa line endings toàn bộ `src/**/*.ts` sang LF.
+- `handleInput` gọi `shouldRestoreNonViet` — kích hoạt phát hiện email/URL/biến.
+- `transform.ts`: guard vòng lặp vô hạn mark revert; cache sorted mark keys; hoist `TONE_VOWEL_PRIORITY`.
+- `prepare` chỉ chạy `husky install` (bỏ build mỗi `npm install`).
+- Gỡ pin `jest-util` lệch major Jest 29.
+- `.npmignore`: bỏ mục lỗi thời.
+- CI: nâng `actions/checkout` và `setup-node` lên v4.
+- Prettier `endOfLine: "lf"`; ESLint `browser` env và rules mới.
+- Chuẩn hóa line endings `src/**/*.ts` sang LF.
+- `docs/README.md`: mô tả contributing khớp GitFlow (không PR cho feature).
 
 ## [1.0.0] - 2025-09-13
 

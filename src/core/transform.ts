@@ -1,6 +1,17 @@
 import { InputMethodRule } from '../types';
-import { VIETNAMESE_CHARS } from '../constants';
+import { TONE_VOWEL_PRIORITY, VIETNAMESE_CHARS } from '../constants';
 import { findVowelPosition } from '../utils/helpers';
+
+const sortedMarkKeysCache = new WeakMap<InputMethodRule, string[]>();
+
+function getSortedMarkKeys(method: InputMethodRule): string[] {
+  let keys = sortedMarkKeysCache.get(method);
+  if (!keys) {
+    keys = Object.keys(method.markRules).sort((a, b) => b.length - a.length);
+    sortedMarkKeysCache.set(method, keys);
+  }
+  return keys;
+}
 
 /**
  * Pure, side-effect-free transformation utilities extracted from VietnameseInput.
@@ -47,9 +58,7 @@ export function processInputByMethod(
 
   // Mark rules (diacritic/key sequences)
   let changed = true;
-  const markKeys = Object.keys(method.markRules).sort(
-    (a, b) => b.length - a.length,
-  );
+  const markKeys = getSortedMarkKeys(method);
   while (changed) {
     changed = false;
     for (const key of markKeys) {
@@ -58,12 +67,15 @@ export function processInputByMethod(
       if (idxExact !== -1) {
         const before = working.slice(0, idxExact);
         const after = working.slice(idxExact + key.length);
+        const prev = working;
         if (before.endsWith(result)) {
           working = before + key + after;
         } else {
           working = before + result + after;
         }
-        changed = true;
+        if (working !== prev) {
+          changed = true;
+        }
         break;
       }
       const lowerKey = key.toLowerCase();
@@ -77,12 +89,15 @@ export function processInputByMethod(
         let mapped = result;
         const alt = method.markRules[key.toUpperCase()];
         if (suggestsUpper && alt) mapped = alt;
+        const prev = working;
         if (before.endsWith(mapped)) {
           working = before + segment + after;
         } else {
           working = before + mapped + after;
         }
-        changed = true;
+        if (working !== prev) {
+          changed = true;
+        }
         break;
       }
     }
@@ -98,33 +113,6 @@ export function processInputByMethod(
 export function applyToneToText(text: string, toneIndex: number): string {
   const vowelPositions = findVowelPosition(text);
   if (vowelPositions.length === 0) return text;
-
-  const priority = [
-    'a',
-    'ă',
-    'â',
-    'o',
-    'ô',
-    'ơ',
-    'e',
-    'ê',
-    'u',
-    'ư',
-    'i',
-    'y',
-    'A',
-    'Ă',
-    'Â',
-    'O',
-    'Ô',
-    'Ơ',
-    'E',
-    'Ê',
-    'U',
-    'Ư',
-    'I',
-    'Y',
-  ];
 
   const isAllUpper = text === text.toUpperCase();
   const findMappingForChar = (ch: string) => {
@@ -149,8 +137,8 @@ export function applyToneToText(text: string, toneIndex: number): string {
     if (!mapping) continue;
     const base = mapping[0];
     const rank =
-      priority.indexOf(base) !== -1
-        ? priority.indexOf(base)
+      TONE_VOWEL_PRIORITY.indexOf(base) !== -1
+        ? TONE_VOWEL_PRIORITY.indexOf(base)
         : Number.MAX_SAFE_INTEGER;
     if (rank < bestRank || (rank === bestRank && p > chosenPos)) {
       bestRank = rank;

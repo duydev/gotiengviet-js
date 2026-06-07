@@ -150,13 +150,11 @@ describe('VietnameseInput internal logic (coverage)', () => {
     expect(vi['processInput']('DD', INPUT_METHODS.telex)).toBe('Đ');
   });
 
-  // Known failing cases documented as tests
-  it('known issue: MIFNH should become MÌNH (currently fails)', () => {
-    // User types: M I F N H -> expects MÌNH
+  it('regression: MIFNH becomes MÌNH', () => {
     expect(vi['processInput']('MIFNH', INPUT_METHODS.telex)).toBe('MÌNH');
   });
 
-  it('known issue: huowng should become hương and HUOWNG -> HƯƠNG (currently fails)', () => {
+  it('regression: huowng becomes hương and HUOWNG -> HƯƠNG', () => {
     expect(vi['processInput']('huowng', INPUT_METHODS.telex)).toBe('hương');
     expect(vi['processInput']('HUOWNG', INPUT_METHODS.telex)).toBe('HƯƠNG');
   });
@@ -186,6 +184,33 @@ describe('VietnameseInput internal logic (coverage)', () => {
     Object.defineProperty(event, 'target', { value: input });
     vi['handleInput'](event);
     expect(input.value).toBe('baaă');
+  });
+
+  it('handleInput: skips email addresses', () => {
+    input.value = 'test@email.com';
+    input.selectionStart = 16;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('test@email.com');
+  });
+
+  it('handleInput: skips variable-like tokens', () => {
+    input.value = 'const variableName';
+    input.selectionStart = 18;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('const variableName');
+  });
+
+  it('handleInput: skips URLs', () => {
+    input.value = 'see https://abc.com';
+    input.selectionStart = 19;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('see https://abc.com');
   });
 
   it('handleInput: no change when processed equals lastWord', () => {

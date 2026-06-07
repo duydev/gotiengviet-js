@@ -16,7 +16,7 @@ cd gotiengviet-js
 npm install
 ```
 
-Hook `prepare` sẽ tự chạy `npm run build` sau `npm install`.
+Hook `prepare` chạy `husky install` để kích hoạt pre-commit (`lint-staged`).
 
 ## Scripts
 
@@ -31,6 +31,7 @@ Hook `prepare` sẽ tự chạy `npm run build` sau `npm install`.
 | `npm run format:check` | Prettier check (không ghi file) |
 | `npm run clean` | Xóa thư mục `dist/` |
 | `npm run serve` | Static server cho demo (`example/`) |
+| `npm run quality-gate` | `format:check` → lint → test → build |
 
 ## Cấu trúc mã nguồn
 

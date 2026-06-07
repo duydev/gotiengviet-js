@@ -12,7 +12,7 @@ Xem thêm: [Kiểm thử](./testing.md) (chiến lược, cấu hình Jest, cove
 | `src/__tests__/utils.test.ts` | 15 | Unit | `helpers.ts` |
 | `src/__tests__/VietnameseInput.test.ts` | 22 | Integration | `VietnameseInput` + DOM |
 | `src/__tests__/utilsIndex.test.ts` | 1 | Smoke | Re-export `utils/index.ts` |
-| **Tổng** | **120** | | |
+| **Tổng** | **125** | | |
 
 ```mermaid
 flowchart LR
@@ -221,13 +221,14 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 | Vị trí nguyên âm ASCII | `'TiengViet'` → `[1,2,6,7]`; `'abc'` → `[0]`; `'xyz'` → `[1]`; `''` → `[]` | |
 | Nguyên âm có dấu mũ | `'ươuăâêôơư'` → `[0..8]` | |
 
-### 2.4 `shouldRestoreNonViet` (4 kịch bản)
+### 2.4 `shouldRestoreNonViet` (5 kịch bản)
 
 | Kịch bản | Đầu vào | Kết quả | Ý nghĩa |
 |----------|---------|---------|---------|
 | Email | `'test@email.com'` | `true` | Không sửa email |
 | URL | `'https://...'`, `'http://...'` | `true` | Không sửa URL |
-| Biến / mã | `'variableName'`, `'test123'`, `'a'` | `true` | Giống identifier |
+| Biến / mã | `'variableName'`, `'test123'`, `'code_snippet'` | `true` | camelCase, digit, snake_case |
+| Chuỗi gõ VN | `'baas'`, `'baaa'`, `'hoa1'` | `false` | Cho phép transform (kể cả VNI) |
 | Tiếng Việt | `'Tiếng Việt'`, `'Xin chao'` | `false` | Cho phép transform |
 
 ### 2.5 `replaceText` (4 kịch bản)
@@ -241,7 +242,7 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 
 ---
 
-## 3. `VietnameseInput.test.ts` — Integration (22)
+## 3. `VietnameseInput.test.ts` — Integration (25)
 
 ### 3.1 Singleton lifecycle (2 kịch bản)
 
@@ -276,7 +277,15 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 | Disabled hoặc composing | `disable()` hoặc `composing = true` | Không transform |
 | `lastWord.length < 2` | `value = 'a'` | Chỉ xử lý từ ≥ 2 ký tự |
 
-### 3.6 `handleInput` — Transform qua DOM (6 kịch bản)
+### 3.6 `handleInput` — Skip non-Vietnamese (3 kịch bản)
+
+| Kịch bản | Input value | Sau xử lý |
+|----------|-------------|-----------|
+| Email | `test@email.com` | không đổi |
+| Biến camelCase | `const variableName` | không đổi |
+| URL | `see https://abc.com` | không đổi |
+
+### 3.7 `handleInput` — Transform qua DOM (6 kịch bản)
 
 | # | Bộ gõ | Input value | Sau xử lý | Rule |
 |---|-------|-------------|-----------|------|

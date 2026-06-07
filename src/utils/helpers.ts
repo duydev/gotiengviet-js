@@ -21,12 +21,36 @@ export function findVowelPosition(text: string): number[] {
 }
 
 export function shouldRestoreNonViet(text: string): boolean {
-  // Check if the text might be a code snippet, URL, email, etc.
-  return (
-    /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(text) || // email
-    /^https?:\/\//.test(text) || // URL
-    /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(text) // variable name
-  );
+  // Email and URL — always skip transform
+  if (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(text)) {
+    return true;
+  }
+  if (/^https?:\/\//.test(text)) {
+    return true;
+  }
+
+  // snake_case identifiers
+  if (text.includes('_')) {
+    return true;
+  }
+
+  // camelCase (e.g. variableName)
+  if (/[a-z][A-Z]/.test(text)) {
+    return true;
+  }
+
+  // VNI: trailing single digit 0–5 is a tone key, not a code token
+  const vniToneStripped = text.replace(/[0-5]$/, '');
+  if (vniToneStripped !== text && /^\D+$/.test(vniToneStripped)) {
+    return false;
+  }
+
+  // Tokens with digits (e.g. test123) — but not pure-letter Vietnamese input
+  if (/\d/.test(text)) {
+    return true;
+  }
+
+  return false;
 }
 
 // Helper function to update text maintaining cursor position

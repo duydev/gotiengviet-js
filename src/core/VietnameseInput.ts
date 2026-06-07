@@ -1,6 +1,6 @@
 import { InputConfig, InputMethod, InputMethodRule } from '../types';
 import { INPUT_METHODS } from '../constants';
-import { getLastWord, replaceText } from '../utils';
+import { getLastWord, replaceText, shouldRestoreNonViet } from '../utils';
 import { processInputByMethod } from './transform';
 import { applyToneToText } from './transform';
 
@@ -87,6 +87,7 @@ export class VietnameseInput {
     const lastWord = getLastWord(value, cursorPos);
     // keep previous behavior: only attempt when last word has at least 2 chars
     if (lastWord.length < 2) return;
+    if (shouldRestoreNonViet(lastWord)) return;
     const method = INPUT_METHODS[this.config.inputMethod || 'telex'];
     const processed = processInputByMethod(lastWord, method);
     if (processed !== lastWord) {
