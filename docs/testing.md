@@ -10,6 +10,8 @@ Dự án sử dụng **Jest** với môi trường **jsdom** để mô phỏng D
 | Integration test | VietnameseInput + DOM events | `VietnameseInput.test.ts` |
 | Index test | Public exports | `utilsIndex.test.ts` |
 
+**Catalog đầy đủ 120 kịch bản:** [test-scenarios.md](./test-scenarios.md) — bảng input/expected theo từng `describe` block.
+
 ## Chạy test
 
 ```bash
@@ -73,7 +75,7 @@ describe('processInputByMethod', () => {
 
   it('handles multi-vowel tone priority', () => {
     const result = processInputByMethod('hoas', INPUT_METHODS.telex);
-    expect(result).toBe('hóa');
+    expect(result).toBe('hoá');
   });
 });
 ```
@@ -84,7 +86,28 @@ describe('processInputByMethod', () => {
 - Chữ hoa / chữ thường
 - Từ nhiều nguyên âm
 - Trường hợp không đổi (no-op)
-- Chuỗi đặc biệt (email, URL) nếu có guard
+- Hành vi thực tế vs kỳ vọng lý tưởng (document known limitations)
+
+### Bảng test hiện tại (120 cases)
+
+| File | Số test | Phạm vi chính |
+|------|---------|---------------|
+| `transform.test.ts` | 82 | `applyToneToText`, Telex/VNI/VIQR marks & tones, edge cases |
+| `utils.test.ts` | 15 | `getLastWord`, `findVowelPosition`, `replaceText` (+ fallback) |
+| `VietnameseInput.test.ts` | 22 | Singleton, config, DOM `handleInput` (3 bộ gõ) |
+| `utilsIndex.test.ts` | 1 | Re-export smoke |
+
+Chi tiết từng kịch bản (input, expected, mục đích): **[test-scenarios.md](./test-scenarios.md)**.
+
+### Coverage hiện tại
+
+| Metric | Giá trị |
+|--------|---------|
+| Statements | ~96% |
+| Branches | ~82% |
+| Lines | ~97% |
+
+Các nhánh chưa cover và known limitations: xem [mục 5–6 trong test-scenarios.md](./test-scenarios.md#5-known-limitations-tổng-hợp).
 
 ### 2. Integration tests (`VietnameseInput.test.ts`)
 

@@ -88,4 +88,29 @@ describe('replaceText', () => {
     expect(textarea.selectionStart).toBe(5);
     expect(textarea.selectionEnd).toBe(5);
   });
+
+  it('restores scrollTop after replacement', () => {
+    const textarea = document.createElement('textarea');
+    textarea.value = 'line one\nline two\nline three';
+    Object.defineProperty(textarea, 'scrollTop', {
+      writable: true,
+      value: 42,
+    });
+    replaceText(textarea, 'replaced', 0, 4);
+    expect(textarea.scrollTop).toBe(42);
+  });
+
+  it('uses manual splice fallback when setRangeText is unavailable', () => {
+    const fallbackInput = {
+      value: 'hello world',
+      scrollTop: 0,
+      selectionStart: 11,
+      selectionEnd: 11,
+    } as HTMLInputElement;
+
+    replaceText(fallbackInput, 'world', 6, 11);
+    expect(fallbackInput.value).toBe('hello world');
+    expect(fallbackInput.selectionStart).toBe(11);
+    expect(fallbackInput.selectionEnd).toBe(11);
+  });
 });
