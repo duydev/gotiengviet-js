@@ -73,7 +73,7 @@ describe('processInputByMethod', () => {
 
   it('handles multi-vowel tone priority', () => {
     const result = processInputByMethod('hoas', INPUT_METHODS.telex);
-    expect(result).toBe('hóa');
+    expect(result).toBe('hoá');
   });
 });
 ```
@@ -84,7 +84,39 @@ describe('processInputByMethod', () => {
 - Chữ hoa / chữ thường
 - Từ nhiều nguyên âm
 - Trường hợp không đổi (no-op)
-- Chuỗi đặc biệt (email, URL) nếu có guard
+- Hành vi thực tế vs kỳ vọng lý tưởng (document known limitations)
+
+### Bảng test hiện tại (120 cases)
+
+| File | Số test | Phạm vi chính |
+|------|---------|---------------|
+| `transform.test.ts` | 82 | `applyToneToText`, Telex/VNI/VIQR marks & tones, edge cases |
+| `utils.test.ts` | ~15 | `getLastWord`, `findVowelPosition`, `replaceText` (+ fallback) |
+| `VietnameseInput.test.ts` | ~20 | Singleton, config, DOM `handleInput` (3 bộ gõ) |
+| `utilsIndex.test.ts` | 1 | Re-export smoke |
+
+### Coverage mục tiêu
+
+Sau mở rộng test (nhánh `feature/maximize-test-coverage`):
+
+| Metric | Trước | Sau |
+|--------|-------|-----|
+| Statements | ~94% | ~96% |
+| Branches | ~77% | ~82% |
+| Lines | ~95% | ~97% |
+
+Các nhánh còn thiếu chủ yếu ở `transform.ts` (mark revert, tone skip) — khó cover hết mà không thêm fixture phức tạp.
+
+### Known limitations (document trong test)
+
+| Input | Kỳ vọng lý tưởng | Hành vi engine |
+|-------|------------------|----------------|
+| `nguoiwf` (Telex) | `người` | `nguòiw` |
+| `tieengs` | `tiếng` | `tieéng` |
+| `basz` (Telex) | `ba` (bỏ z) | `báz` |
+| VIQR `b'a` | `bá` | không đổi (tone phải sau vowel: `a'`) |
+| VIQR `a^` | `â` | `a` (`^` là tone revert) |
+| VNI `dd1` | `đ` + tone | `dd1` (cần `d9` trước) |
 
 ### 2. Integration tests (`VietnameseInput.test.ts`)
 

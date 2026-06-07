@@ -20,6 +20,19 @@ describe('VietnameseInput singleton', () => {
   });
 });
 
+describe('VietnameseInput default config', () => {
+  afterEach(() => {
+    VietnameseInput.destroyInstance();
+  });
+
+  it('defaults to enabled telex', () => {
+    const vi = VietnameseInput.getInstance();
+    expect(vi.isEnabled()).toBe(true);
+    expect(vi.getInputMethod()).toBe('telex');
+    vi.destroy();
+  });
+});
+
 describe('VietnameseInput config and methods', () => {
   let vi: VietnameseInput;
   beforeEach(() => {
@@ -153,5 +166,59 @@ describe('VietnameseInput internal logic (coverage)', () => {
     vi.destroy();
     expect(spy1).toHaveBeenCalled();
     spy1.mockRestore();
+  });
+
+  it('handleInput: VNI tone replacement', () => {
+    vi.setInputMethod('vni');
+    input.value = 'xin hoa1';
+    input.selectionStart = 8;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('xin hoá');
+  });
+
+  it('handleInput: VIQR mark replacement', () => {
+    vi.setInputMethod('viqr');
+    input.value = 'baaa(';
+    input.selectionStart = 5;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('baaă');
+  });
+
+  it('handleInput: no change when processed equals lastWord', () => {
+    input.value = 'hello';
+    input.selectionStart = 5;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('hello');
+  });
+
+  it('handleInput: uses value length when selectionStart is null', () => {
+    const target = {
+      value: 'baas',
+      selectionStart: null as number | null,
+      selectionEnd: null as number | null,
+      scrollTop: 0,
+      setRangeText(
+        replacement: string,
+        start: number,
+        end: number,
+        _selectionMode?: string,
+      ) {
+        this.value =
+          this.value.slice(0, start) + replacement + this.value.slice(end);
+        const pos = start + replacement.length;
+        this.selectionStart = pos;
+        this.selectionEnd = pos;
+      },
+    } as HTMLInputElement;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: target });
+    vi['handleInput'](event);
+    expect(target.value).toBe('baá');
   });
 });
