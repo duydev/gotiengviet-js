@@ -17,6 +17,7 @@ Phase 6 of `docs/feature-workflow.md`. Run **before commit**.
 | Public API | `docs/api-reference.md` |
 | Input method rules | `docs/input-methods.md` |
 | Architecture / flow | `docs/architecture.md` |
+| Business flows / diagrams | `docs/business-flows.md` |
 | Usage / integration | `docs/getting-started.md` |
 | Build / CI | `docs/build-and-release.md` |
 | User-facing any | `docs/changelog.md` → `[Unreleased]` |

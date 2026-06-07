@@ -27,6 +27,17 @@ Use with skill `maintain-docs`. Mark each item after verification.
 - [ ] Examples produce expected Vietnamese output
 ```
 
+## Business flows (`docs/business-flows.md`)
+
+```
+- [ ] 11 luồng nghiệp vụ documented
+- [ ] Mermaid charts render correctly
+- [ ] Runtime flow matches VietnameseInput.ts
+- [ ] Transform pipeline matches transform.ts order
+- [ ] GitFlow/CI flows match actual workflows
+- [ ] Cross-links to architecture, input-methods, feature-workflow
+```
+
 ## Architecture (`docs/architecture.md`)
 
 ```

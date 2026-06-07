@@ -88,6 +88,8 @@ Chứa dữ liệu tĩnh:
 | `isVietnameseWord(text)` | Kiểm tra chuỗi chỉ chứa ký tự tiếng Việt |
 | `shouldRestoreNonViet(text)` | Phát hiện email, URL, tên biến |
 
+Tài liệu luồng nghiệp vụ chi tiết (11 flow + sơ đồ): [business-flows.md](./business-flows.md).
+
 ## Luồng xử lý sự kiện
 
 ```mermaid

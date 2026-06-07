@@ -405,8 +405,25 @@ git branch -d feature/hoa-tone-priority
 | Quên cập nhật docs | Quay lại Bước 6 trước khi merge |
 | Nhiều task in_progress | Chỉ giữ một, hoàn thành hoặc cancel các task còn lại |
 
+## Sơ đồ workflow
+
+```mermaid
+flowchart TD
+    P1[1. Nhận yêu cầu] --> P2[2. Phân tích tasks]
+    P2 --> P3[3. Theo dõi tasks]
+    P3 --> P4[4. Implement]
+    P4 --> P5[5. Format & Lint]
+    P5 --> P6[6. Cập nhật docs]
+    P6 --> P7[7. Git merge develop]
+    P7 --> P3
+    P7 --> Done[Hoàn thành]
+```
+
+Luồng nghiệp vụ đầy đủ (runtime + dev + release): [business-flows.md](./business-flows.md).
+
 ## Tài liệu liên quan
 
+- [Luồng nghiệp vụ](./business-flows.md)
 - [GitFlow](./gitflow.md)
 - [Linter](./linter.md)
 - [Formatter](./formatter.md)

@@ -7,6 +7,10 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Tài liệu `docs/business-flows.md` — 11 luồng nghiệp vụ chi tiết kèm sơ đồ Mermaid (tích hợp, gõ runtime, transform, GitFlow, CI/CD).
+
 ## [1.0.0] - 2025-09-13
 
 ### Added

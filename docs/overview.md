@@ -55,6 +55,10 @@ Dự án ra đời để giải quyết nhu cầu thực tế của người dù
 | Giấy phép | MIT |
 | Tác giả | Tran Nhat Duy |
 
+## Luồng nghiệp vụ
+
+Xem sơ đồ chi tiết các luồng runtime, thuật toán, tích hợp và phát triển tại [business-flows.md](./business-flows.md).
+
 ## Cấu trúc repository
 
 ```

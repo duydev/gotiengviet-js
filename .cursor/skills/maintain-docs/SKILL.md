@@ -53,6 +53,7 @@ Full audit checklist: [audit-checklist.md](audit-checklist.md)
 | `docs/getting-started.md` | Install, usage, framework examples |
 | `docs/api-reference.md` | All public methods + types |
 | `docs/input-methods.md` | `INPUT_METHODS` rules exactly |
+| `docs/business-flows.md` | Business flows + Mermaid charts |
 | `docs/architecture.md` | File layout, data flow |
 | `docs/development.md` | Scripts, conventions |
 | `docs/testing.md` | Jest config from `package.json` |
