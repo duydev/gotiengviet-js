@@ -171,7 +171,7 @@ U + Ơ → ƯƠ
 
 ## Phát hiện nội dung không phải tiếng Việt
 
-Helper `shouldRestoreNonViet` phát hiện và tránh biến đổi:
+`VietnameseInput.handleInput` gọi `shouldRestoreNonViet` trước khi transform — tránh biến đổi:
 
 - Địa chỉ email (`user@example.com`)
 - URL (`https://...`)

@@ -238,6 +238,10 @@ describe('processInputByMethod — edge cases', () => {
     expect(processInputByMethod('aâ', telex)).toBe('aâ');
   });
 
+  test('mark revert loop guard: âaa terminates without hang', () => {
+    expect(processInputByMethod('âaa', telex)).toBe('âaa');
+  });
+
   test('known: MIFNH → MÌNH', () => {
     expect(processInputByMethod('MIFNH', telex)).toBe('MÌNH');
   });

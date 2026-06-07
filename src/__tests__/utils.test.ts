@@ -61,7 +61,13 @@ describe('shouldRestoreNonViet', () => {
   it('returns true for variable names', () => {
     expect(shouldRestoreNonViet('variableName')).toBe(true);
     expect(shouldRestoreNonViet('test123')).toBe(true);
-    expect(shouldRestoreNonViet('a')).toBe(true);
+    expect(shouldRestoreNonViet('code_snippet')).toBe(true);
+  });
+
+  it('returns false for Vietnamese typing sequences', () => {
+    expect(shouldRestoreNonViet('baas')).toBe(false);
+    expect(shouldRestoreNonViet('baaa')).toBe(false);
+    expect(shouldRestoreNonViet('hoa1')).toBe(false);
   });
   it('returns false for Vietnamese words', () => {
     expect(shouldRestoreNonViet('Tiếng Việt')).toBe(false);

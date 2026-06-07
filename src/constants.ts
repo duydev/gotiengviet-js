@@ -28,6 +28,34 @@ export const VIETNAMESE_CHARS = {
   Y: ['Y', 'Ý', 'Ỳ', 'Ỷ', 'Ỹ', 'Ỵ'],
 };
 
+/** Vowel priority when applying tone to multi-vowel sequences */
+export const TONE_VOWEL_PRIORITY = [
+  'a',
+  'ă',
+  'â',
+  'o',
+  'ô',
+  'ơ',
+  'e',
+  'ê',
+  'u',
+  'ư',
+  'i',
+  'y',
+  'A',
+  'Ă',
+  'Â',
+  'O',
+  'Ô',
+  'Ơ',
+  'E',
+  'Ê',
+  'U',
+  'Ư',
+  'I',
+  'Y',
+];
+
 export const DEFAULT_CONFIG = {
   enabled: true,
   inputMethod: 'telex' as const,
