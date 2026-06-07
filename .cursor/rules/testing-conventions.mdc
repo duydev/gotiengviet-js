@@ -1,0 +1,42 @@
+---
+description: Jest testing patterns for gotiengviet-js
+globs: src/__tests__/**/*.ts
+alwaysApply: false
+---
+
+# Testing
+
+- Location: `src/__tests__/*.test.ts`
+- Environment: jsdom (configured in `package.json`)
+- Coverage excludes: `index.ts`, `types.ts`, `constants.ts`
+
+## Singleton cleanup (required)
+
+```typescript
+afterEach(() => {
+  VietnameseInput.destroyInstance();
+});
+```
+
+## Test types
+
+| Type | Target | Focus |
+|------|--------|-------|
+| Unit | `transform.ts`, `helpers.ts` | Multi-vowel, uppercase, tone priority, no-op |
+| Integration | `VietnameseInput.ts` | Singleton, enable/disable, DOM events |
+
+## DOM integration pattern
+
+```typescript
+const input = document.createElement('input');
+document.body.appendChild(input);
+input.value = 'bas';
+input.selectionStart = input.selectionEnd = 3;
+input.dispatchEvent(new Event('input', { bubbles: true }));
+// assert input.value
+document.body.removeChild(input);
+```
+
+## All three input methods
+
+Test Telex, VNI, and VIQR when changing `INPUT_METHODS` or transform logic.

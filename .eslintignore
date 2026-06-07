@@ -1,4 +1,5 @@
 dist/
 node_modules/
-.cache
-.vite
+coverage/
+.cache/
+.vite/

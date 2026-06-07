@@ -4,6 +4,10 @@ import {
   findVowelPosition,
   shouldRestoreNonViet,
   replaceText,
+  getEditableText,
+  getCaretOffset,
+  isContentEditableElement,
+  isEditableElement,
 } from '../utils/helpers';
 
 describe('isVietnameseWord', () => {
@@ -61,11 +65,58 @@ describe('shouldRestoreNonViet', () => {
   it('returns true for variable names', () => {
     expect(shouldRestoreNonViet('variableName')).toBe(true);
     expect(shouldRestoreNonViet('test123')).toBe(true);
-    expect(shouldRestoreNonViet('a')).toBe(true);
+    expect(shouldRestoreNonViet('code_snippet')).toBe(true);
+  });
+
+  it('returns false for Vietnamese typing sequences', () => {
+    expect(shouldRestoreNonViet('baas')).toBe(false);
+    expect(shouldRestoreNonViet('baaa')).toBe(false);
+    expect(shouldRestoreNonViet('hoa1')).toBe(false);
   });
   it('returns false for Vietnamese words', () => {
     expect(shouldRestoreNonViet('Tiếng Việt')).toBe(false);
     expect(shouldRestoreNonViet('Xin chao')).toBe(false);
+  });
+});
+
+describe('contenteditable helpers', () => {
+  it('detects contenteditable elements', () => {
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'true');
+    expect(isContentEditableElement(div)).toBe(true);
+    expect(isEditableElement(div)).toBe(true);
+    expect(isEditableElement(document.createElement('span'))).toBe(false);
+  });
+
+  it('getEditableText and replaceText on contenteditable', () => {
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'true');
+    div.innerText = 'hello world';
+    document.body.appendChild(div);
+
+    expect(getEditableText(div)).toBe('hello world');
+    replaceText(div, 'everyone', 6, 11);
+    expect(div.innerText).toBe('hello everyone');
+
+    document.body.removeChild(div);
+  });
+
+  it('getCaretOffset at end of contenteditable', () => {
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'true');
+    div.textContent = 'baas';
+    document.body.appendChild(div);
+
+    const textNode = div.firstChild as Text;
+    const range = document.createRange();
+    range.setStart(textNode, 4);
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+
+    expect(getCaretOffset(div)).toBe(4);
+    document.body.removeChild(div);
   });
 });
 
@@ -87,5 +138,30 @@ describe('replaceText', () => {
     expect(textarea.value).toBe('Chào Xin chao cac ban');
     expect(textarea.selectionStart).toBe(5);
     expect(textarea.selectionEnd).toBe(5);
+  });
+
+  it('restores scrollTop after replacement', () => {
+    const textarea = document.createElement('textarea');
+    textarea.value = 'line one\nline two\nline three';
+    Object.defineProperty(textarea, 'scrollTop', {
+      writable: true,
+      value: 42,
+    });
+    replaceText(textarea, 'replaced', 0, 4);
+    expect(textarea.scrollTop).toBe(42);
+  });
+
+  it('uses manual splice fallback when setRangeText is unavailable', () => {
+    const fallbackInput = {
+      value: 'hello world',
+      scrollTop: 0,
+      selectionStart: 11,
+      selectionEnd: 11,
+    } as HTMLInputElement;
+
+    replaceText(fallbackInput, 'world', 6, 11);
+    expect(fallbackInput.value).toBe('hello world');
+    expect(fallbackInput.selectionStart).toBe(11);
+    expect(fallbackInput.selectionEnd).toBe(11);
   });
 });

@@ -20,6 +20,19 @@ describe('VietnameseInput singleton', () => {
   });
 });
 
+describe('VietnameseInput default config', () => {
+  afterEach(() => {
+    VietnameseInput.destroyInstance();
+  });
+
+  it('defaults to enabled telex', () => {
+    const vi = VietnameseInput.getInstance();
+    expect(vi.isEnabled()).toBe(true);
+    expect(vi.getInputMethod()).toBe('telex');
+    vi.destroy();
+  });
+});
+
 describe('VietnameseInput config and methods', () => {
   let vi: VietnameseInput;
   beforeEach(() => {
@@ -137,13 +150,11 @@ describe('VietnameseInput internal logic (coverage)', () => {
     expect(vi['processInput']('DD', INPUT_METHODS.telex)).toBe('Đ');
   });
 
-  // Known failing cases documented as tests
-  it('known issue: MIFNH should become MÌNH (currently fails)', () => {
-    // User types: M I F N H -> expects MÌNH
+  it('regression: MIFNH becomes MÌNH', () => {
     expect(vi['processInput']('MIFNH', INPUT_METHODS.telex)).toBe('MÌNH');
   });
 
-  it('known issue: huowng should become hương and HUOWNG -> HƯƠNG (currently fails)', () => {
+  it('regression: huowng becomes hương and HUOWNG -> HƯƠNG', () => {
     expect(vi['processInput']('huowng', INPUT_METHODS.telex)).toBe('hương');
     expect(vi['processInput']('HUOWNG', INPUT_METHODS.telex)).toBe('HƯƠNG');
   });
@@ -153,5 +164,119 @@ describe('VietnameseInput internal logic (coverage)', () => {
     vi.destroy();
     expect(spy1).toHaveBeenCalled();
     spy1.mockRestore();
+  });
+
+  it('handleInput: VNI tone replacement', () => {
+    vi.setInputMethod('vni');
+    input.value = 'xin hoa1';
+    input.selectionStart = 8;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('xin hoá');
+  });
+
+  it('handleInput: VIQR mark replacement', () => {
+    vi.setInputMethod('viqr');
+    input.value = 'baaa(';
+    input.selectionStart = 5;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('baaă');
+  });
+
+  it('handleInput: skips email addresses', () => {
+    input.value = 'test@email.com';
+    input.selectionStart = 16;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('test@email.com');
+  });
+
+  it('handleInput: skips variable-like tokens', () => {
+    input.value = 'const variableName';
+    input.selectionStart = 18;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('const variableName');
+  });
+
+  it('handleInput: skips URLs', () => {
+    input.value = 'see https://abc.com';
+    input.selectionStart = 19;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('see https://abc.com');
+  });
+
+  it('handleInput: no change when processed equals lastWord', () => {
+    input.value = 'hello';
+    input.selectionStart = 5;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: input });
+    vi['handleInput'](event);
+    expect(input.value).toBe('hello');
+  });
+
+  it('handleInput: contenteditable telex tone replacement', () => {
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'true');
+    div.textContent = 'baas';
+    document.body.appendChild(div);
+
+    const textNode = div.firstChild as Text;
+    const range = document.createRange();
+    range.setStart(textNode, 4);
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: div });
+    vi['handleInput'](event);
+    expect(div.innerText).toBe('baá');
+
+    document.body.removeChild(div);
+  });
+
+  it('handleInput: ignores non-editable elements', () => {
+    const div = document.createElement('div');
+    div.innerText = 'baas';
+    document.body.appendChild(div);
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: div });
+    vi['handleInput'](event);
+    expect(div.innerText).toBe('baas');
+    document.body.removeChild(div);
+  });
+
+  it('handleInput: uses value length when selectionStart is null', () => {
+    const target = {
+      value: 'baas',
+      selectionStart: null as number | null,
+      selectionEnd: null as number | null,
+      scrollTop: 0,
+      setRangeText(
+        replacement: string,
+        start: number,
+        end: number,
+        _selectionMode?: string,
+      ) {
+        this.value =
+          this.value.slice(0, start) + replacement + this.value.slice(end);
+        const pos = start + replacement.length;
+        this.selectionStart = pos;
+        this.selectionEnd = pos;
+      },
+    } as HTMLInputElement;
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: target });
+    vi['handleInput'](event);
+    expect(target.value).toBe('baá');
   });
 });

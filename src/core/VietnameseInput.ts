@@ -1,6 +1,14 @@
 import { InputConfig, InputMethod, InputMethodRule } from '../types';
 import { INPUT_METHODS } from '../constants';
-import { getLastWord, replaceText } from '../utils';
+import {
+  type EditableElement,
+  getCaretOffset,
+  getEditableText,
+  getLastWord,
+  isEditableElement,
+  replaceText,
+  shouldRestoreNonViet,
+} from '../utils';
 import { processInputByMethod } from './transform';
 import { applyToneToText } from './transform';
 
@@ -80,13 +88,23 @@ export class VietnameseInput {
       return;
     }
 
-    const target = event.target as HTMLInputElement | HTMLTextAreaElement;
-    const value = target.value;
-    const cursorPos = target.selectionStart || value.length;
+    const target = event.target;
+    if (
+      !target ||
+      typeof target !== 'object' ||
+      !isEditableElement(target as Element)
+    ) {
+      return;
+    }
+
+    const editable = target as EditableElement;
+    const value = getEditableText(editable);
+    const cursorPos = getCaretOffset(editable);
 
     const lastWord = getLastWord(value, cursorPos);
     // keep previous behavior: only attempt when last word has at least 2 chars
     if (lastWord.length < 2) return;
+    if (shouldRestoreNonViet(lastWord)) return;
     const method = INPUT_METHODS[this.config.inputMethod || 'telex'];
     const processed = processInputByMethod(lastWord, method);
     if (processed !== lastWord) {
@@ -95,7 +113,7 @@ export class VietnameseInput {
       const endPos = cursorPos;
       // Replace only the last word segment (replaceText expects the replacement fragment)
       event.preventDefault();
-      replaceText(target, processed, startPos, endPos);
+      replaceText(editable, processed, startPos, endPos);
     }
   }
 

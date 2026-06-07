@@ -28,6 +28,34 @@ export const VIETNAMESE_CHARS = {
   Y: ['Y', 'Ý', 'Ỳ', 'Ỷ', 'Ỹ', 'Ỵ'],
 };
 
+/** Vowel priority when applying tone to multi-vowel sequences */
+export const TONE_VOWEL_PRIORITY = [
+  'a',
+  'ă',
+  'â',
+  'o',
+  'ô',
+  'ơ',
+  'e',
+  'ê',
+  'u',
+  'ư',
+  'i',
+  'y',
+  'A',
+  'Ă',
+  'Â',
+  'O',
+  'Ô',
+  'Ơ',
+  'E',
+  'Ê',
+  'U',
+  'Ư',
+  'I',
+  'Y',
+];
+
 export const DEFAULT_CONFIG = {
   enabled: true,
   inputMethod: 'telex' as const,
@@ -56,6 +84,8 @@ export const INPUT_METHODS: Record<string, InputMethodRule> = {
   vni: {
     toneRules: { '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '0': 0 },
     markRules: {
+      ee: 'ê',
+      EE: 'Ê',
       a6: 'â',
       A6: 'Â',
       e6: 'ê',
@@ -75,6 +105,8 @@ export const INPUT_METHODS: Record<string, InputMethodRule> = {
   viqr: {
     toneRules: { "'": 1, '`': 2, '?': 3, '~': 4, '.': 5, '^': 0 },
     markRules: {
+      ee: 'ê',
+      EE: 'Ê',
       'a^': 'â',
       'A^': 'Â',
       'e^': 'ê',
