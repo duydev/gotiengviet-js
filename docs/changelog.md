@@ -7,6 +7,12 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-06-08
+
+### Changed
+
+- Root `README.md`: viết lại theo chuẩn npm package, song ngữ Anh/Việt, kèm thông tin tác giả.
+
 ## [1.1.0] - 2026-06-08
 
 ### Fixed
