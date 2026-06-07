@@ -84,6 +84,8 @@ export const INPUT_METHODS: Record<string, InputMethodRule> = {
   vni: {
     toneRules: { '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '0': 0 },
     markRules: {
+      ee: 'ê',
+      EE: 'Ê',
       a6: 'â',
       A6: 'Â',
       e6: 'ê',
@@ -103,6 +105,8 @@ export const INPUT_METHODS: Record<string, InputMethodRule> = {
   viqr: {
     toneRules: { "'": 1, '`': 2, '?': 3, '~': 4, '.': 5, '^': 0 },
     markRules: {
+      ee: 'ê',
+      EE: 'Ê',
       'a^': 'â',
       'A^': 'Â',
       'e^': 'ê',

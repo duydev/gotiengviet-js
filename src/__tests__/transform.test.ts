@@ -23,9 +23,9 @@ describe('applyToneToText', () => {
     expect(applyToneToText('ma', 5)).toBe('mạ');
   });
 
-  test('tone index 0 on plain vowel keeps base form', () => {
+  test('tone index 0 reverts to base vowel', () => {
     expect(applyToneToText('ma', 0)).toBe('ma');
-    expect(applyToneToText('má', 0)).toBe('má');
+    expect(applyToneToText('má', 0)).toBe('ma');
   });
 
   test('multi-vowel: priority picks a over o in hoa', () => {
@@ -95,8 +95,8 @@ describe('processInputByMethod — Telex', () => {
       expect(processInputByMethod(input, telex)).toBe(expected);
     });
 
-    test('z as tone key applies ngang on preceding vowel', () => {
-      expect(processInputByMethod('basz', telex)).toBe('báz');
+    test('z as tone key reverts tone (bas + z → ba)', () => {
+      expect(processInputByMethod('basz', telex)).toBe('ba');
     });
 
     test('double s: first s applies tone', () => {
@@ -104,17 +104,17 @@ describe('processInputByMethod — Telex', () => {
     });
   });
 
-  describe('compound words (actual engine output)', () => {
-    test('tieengs produces tieéng (double e retained)', () => {
-      expect(processInputByMethod('tieengs', telex)).toBe('tieéng');
+  describe('compound words', () => {
+    test('tieengs → tiếng (ee mark before tone)', () => {
+      expect(processInputByMethod('tieengs', telex)).toBe('tiếng');
     });
 
-    test('vieetj produces vieẹt (ee retained, tone on e)', () => {
-      expect(processInputByMethod('vieetj', telex)).toBe('vieẹt');
+    test('vieetj → việt (ee mark before tone)', () => {
+      expect(processInputByMethod('vieetj', telex)).toBe('việt');
     });
 
-    test('nguoiwf applies tone on o', () => {
-      expect(processInputByMethod('nguoiwf', telex)).toBe('nguòiw');
+    test('nguoiwf → người (uoiw normalize + tone)', () => {
+      expect(processInputByMethod('nguoiwf', telex)).toBe('người');
     });
   });
 
@@ -159,15 +159,15 @@ describe('processInputByMethod — VNI', () => {
       expect(processInputByMethod('ba10', vni)).toBe('bá0');
     });
 
-    test('dd1 unchanged (d9 mark needs separate step)', () => {
-      expect(processInputByMethod('dd1', vni)).toBe('dd1');
+    test('dd1 → đá (dd + tone expands to đa + tone)', () => {
+      expect(processInputByMethod('dd1', vni)).toBe('đá');
     });
   });
 
   describe('compound words', () => {
-    test('tieeng5 and vieetj5', () => {
-      expect(processInputByMethod('tieeng5', vni)).toBe('tieẹng');
-      expect(processInputByMethod('vieetj5', vni)).toBe('vieẹtj');
+    test('tieeng5 → tiệng and vieetj5 → việt', () => {
+      expect(processInputByMethod('tieeng5', vni)).toBe('tiệng');
+      expect(processInputByMethod('vieetj5', vni)).toBe('việtj');
     });
   });
 });
@@ -188,11 +188,11 @@ describe('processInputByMethod — VIQR', () => {
     });
   });
 
-  describe('mark rules with ^ (tone key conflicts)', () => {
-    test('a^ consumed as tone revert — result a', () => {
-      expect(processInputByMethod('a^', viqr)).toBe('a');
-      expect(processInputByMethod('e^', viqr)).toBe('e');
-      expect(processInputByMethod('o^', viqr)).toBe('o');
+  describe('mark rules with ^ (mark before tone)', () => {
+    test('a^ → â, e^ → ê, o^ → ô', () => {
+      expect(processInputByMethod('a^', viqr)).toBe('â');
+      expect(processInputByMethod('e^', viqr)).toBe('ê');
+      expect(processInputByMethod('o^', viqr)).toBe('ô');
     });
   });
 
@@ -211,20 +211,20 @@ describe('processInputByMethod — VIQR', () => {
     });
   });
 
-  describe('tone before vowel (VIQR style) — not supported', () => {
+  describe('tone before vowel (VIQR repositioned)', () => {
     test.each([
-      ["b'a", "b'a"],
-      ['b`a', 'b`a'],
-      ['b?a', 'b?a'],
-    ])('%s unchanged', (input, expected) => {
+      ["b'a", 'bá'],
+      ['b`a', 'bà'],
+      ['b?a', 'bả'],
+    ])('%s → %s', (input, expected) => {
       expect(processInputByMethod(input, viqr)).toBe(expected);
     });
   });
 
   describe('compound words', () => {
-    test("tieeng' and vieetj.", () => {
-      expect(processInputByMethod("tieeng'", viqr)).toBe('tieéng');
-      expect(processInputByMethod('vieetj.', viqr)).toBe('vieẹtj');
+    test("tieeng' → tiếng and vieet. → việt", () => {
+      expect(processInputByMethod("tieeng'", viqr)).toBe('tiếng');
+      expect(processInputByMethod('vieet.', viqr)).toBe('việt');
     });
   });
 });

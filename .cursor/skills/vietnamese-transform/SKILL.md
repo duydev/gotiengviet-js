@@ -12,11 +12,13 @@ description: >-
 
 Only edit `src/core/transform.ts`. Keep functions pure — no DOM, no imports from `VietnameseInput`.
 
-## Pipeline order (do not reorder without reason)
+## Pipeline order
 
-1. **Tone rules** — scan for tone keys, apply to vowel left of key
-2. **Mark rules** — longest-key-first replacement (`aa` before `a`)
-3. **Normalize** — `uơ` → `ươ`, `UƠ` → `ƯƠ`
+1. **VIQR preprocess** — reposition tone before vowel (`b'a` → `ba'`)
+2. **VNI preprocess** — `dd[1-5]` → `đa[1-5]`
+3. **Mark rules** — longest-key-first; skip if tone key immediately follows
+4. **Normalize** — `uoiw` → `ươi`, `uơ` → `ươ`
+5. **Tone rules** — scan tone keys; `0`/`z` reverts to base vowel
 
 ## Tone priority (applyToneToText)
 
