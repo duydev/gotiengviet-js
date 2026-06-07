@@ -333,16 +333,10 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 
 ## 5. Known limitations (tổng hợp)
 
-Các kịch bản sau **cố ý** ghi nhận hành vi engine hiện tại, không phải lỗi test:
-
-| Nhóm | Đầu vào | Kỳ vọng lý tưởng | Hành vi thực tế |
-|------|---------|------------------|-----------------|
-| Telex compound | `nguoiwf` | `người` | `nguòiw` |
-| Telex compound | `tieengs` | `tiếng` | `tieéng` |
-| Telex tone z | `basz` | `ba` | `báz` |
-| VIQR tone vị trí | `b'a` | `bá` | không đổi |
-| VIQR mũ | `a^` | `â` | `a` |
-| VNI mark+tone | `dd1` | `đ` + tone | `dd1` |
+| Nhóm | Đầu vào | Ghi chú |
+|------|---------|---------|
+| VNI compound | `vieetj5` | `j` không phải phím tone VNI → `việtj` (dùng `vieet5` cho `việt`) |
+| DOM | `contenteditable` | Chưa hỗ trợ — chỉ `input`/`textarea` |
 
 ## 6. Nhánh code chưa cover (không thêm test)
 

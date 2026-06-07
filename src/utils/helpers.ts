@@ -1,3 +1,24 @@
+import { VIETNAMESE_CHARS } from '../constants';
+
+function isVowelChar(ch: string): boolean {
+  const lower = ch.toLowerCase();
+  if (/[aeiouyăâêôơư]/.test(lower)) {
+    return true;
+  }
+  if (lower in VIETNAMESE_CHARS) {
+    return true;
+  }
+  for (const key of Object.keys(VIETNAMESE_CHARS) as Array<
+    keyof typeof VIETNAMESE_CHARS
+  >) {
+    const arr = VIETNAMESE_CHARS[key];
+    if (arr.indexOf(ch) !== -1 || arr.indexOf(lower) !== -1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function isVietnameseWord(text: string): boolean {
   return /^[a-zA-ZÀ-ỹ\s]+$/.test(text);
 }
@@ -9,14 +30,12 @@ export function getLastWord(value: string, position: number): string {
 }
 
 export function findVowelPosition(text: string): number[] {
-  const vowels = /[aeiouyăâêôơưAEIOUYĂÂÊÔƠƯ]/gi;
-  const positions = [];
-  let match;
-
-  while ((match = vowels.exec(text)) !== null) {
-    positions.push(match.index);
+  const positions: number[] = [];
+  for (let i = 0; i < text.length; i++) {
+    if (isVowelChar(text[i])) {
+      positions.push(i);
+    }
   }
-
   return positions;
 }
 

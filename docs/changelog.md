@@ -7,6 +7,14 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Pipeline transform: mark → normalize → tone (sửa `tieengs`→`tiếng`, `nguoiwf`→`người`, `basz`→`ba`).
+- `findVowelPosition` nhận diện nguyên âm có dấu (revert tone `z`/`0` hoạt động trên `má`→`ma`).
+- VIQR: `a^`→`â`, tone trước vowel (`b'a`→`bá`), thêm mark `ee`→`ê`.
+- VNI: `dd1`→`đá`, `ee`→`ê`, `ba10`→`bá0`.
+- Guard mark khi tone key ngay sau (`baas`→`baá`), skip tone lặp trên vowel đã dấu (`ass`→`ás`).
+
 ### Added
 
 - Export công khai `processInputByMethod`, `applyToneToText` (headless transform).
