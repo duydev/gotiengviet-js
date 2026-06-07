@@ -222,6 +222,39 @@ describe('VietnameseInput internal logic (coverage)', () => {
     expect(input.value).toBe('hello');
   });
 
+  it('handleInput: contenteditable telex tone replacement', () => {
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'true');
+    div.textContent = 'baas';
+    document.body.appendChild(div);
+
+    const textNode = div.firstChild as Text;
+    const range = document.createRange();
+    range.setStart(textNode, 4);
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: div });
+    vi['handleInput'](event);
+    expect(div.innerText).toBe('baá');
+
+    document.body.removeChild(div);
+  });
+
+  it('handleInput: ignores non-editable elements', () => {
+    const div = document.createElement('div');
+    div.innerText = 'baas';
+    document.body.appendChild(div);
+    const event = new Event('input', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: div });
+    vi['handleInput'](event);
+    expect(div.innerText).toBe('baas');
+    document.body.removeChild(div);
+  });
+
   it('handleInput: uses value length when selectionStart is null', () => {
     const target = {
       value: 'baas',

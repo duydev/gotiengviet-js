@@ -1,6 +1,6 @@
 # Kịch bản kiểm thử (Test Scenarios)
 
-Tài liệu này liệt kê **toàn bộ 120 kịch bản test** hiện có trong dự án, nhóm theo file và `describe` block. Mỗi kịch bản ghi rõ **đầu vào**, **kết quả mong đợi** và **mục đích kiểm tra**.
+Tài liệu này liệt kê **toàn bộ 130 kịch bản test** hiện có trong dự án, nhóm theo file và `describe` block. Mỗi kịch bản ghi rõ **đầu vào**, **kết quả mong đợi** và **mục đích kiểm tra**.
 
 Xem thêm: [Kiểm thử](./testing.md) (chiến lược, cấu hình Jest, coverage).
 
@@ -8,19 +8,19 @@ Xem thêm: [Kiểm thử](./testing.md) (chiến lược, cấu hình Jest, cove
 
 | File | Số kịch bản | Loại | Module được test |
 |------|-------------|------|------------------|
-| `src/__tests__/transform.test.ts` | 82 | Unit | `processInputByMethod`, `applyToneToText` |
-| `src/__tests__/utils.test.ts` | 15 | Unit | `helpers.ts` |
-| `src/__tests__/VietnameseInput.test.ts` | 22 | Integration | `VietnameseInput` + DOM |
+| `src/__tests__/transform.test.ts` | 83 | Unit | `processInputByMethod`, `applyToneToText` |
+| `src/__tests__/utils.test.ts` | 19 | Unit | `helpers.ts` |
+| `src/__tests__/VietnameseInput.test.ts` | 27 | Integration | `VietnameseInput` + DOM |
 | `src/__tests__/utilsIndex.test.ts` | 1 | Smoke | Re-export `utils/index.ts` |
-| **Tổng** | **125** | | |
+| **Tổng** | **130** | | |
 
 ```mermaid
 flowchart LR
-  subgraph unit [Unit tests — 97 cases]
-    T[transform.test.ts<br/>82]
-    U[utils.test.ts<br/>15]
+  subgraph unit [Unit tests — 102 cases]
+    T[transform.test.ts<br/>83]
+    U[utils.test.ts<br/>19]
   end
-  subgraph integration [Integration — 22 cases]
+  subgraph integration [Integration — 27 cases]
     V[VietnameseInput.test.ts]
   end
   subgraph smoke [Smoke — 1 case]
@@ -231,7 +231,15 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 | Chuỗi gõ VN | `'baas'`, `'baaa'`, `'hoa1'` | `false` | Cho phép transform (kể cả VNI) |
 | Tiếng Việt | `'Tiếng Việt'`, `'Xin chao'` | `false` | Cho phép transform |
 
-### 2.5 `replaceText` (4 kịch bản)
+### 2.5 Contenteditable helpers (3 kịch bản)
+
+| Kịch bản | Thiết lập | Kết quả mong đợi |
+|----------|-----------|------------------|
+| `isContentEditableElement` | `div` với `contenteditable="true"` | `true`; `div` thường → `false` |
+| `getEditableText` + `replaceText` | `div` contenteditable, thay `[6,11)` → `'everyone'` | `'hello everyone'`, caret `14` |
+| `getCaretOffset` | Con trỏ cuối text node | Offset bằng độ dài text |
+
+### 2.6 `replaceText` (4 kịch bản)
 
 | # | Kịch bản | Thiết lập | Kết quả mong đợi |
 |---|----------|-----------|------------------|
@@ -242,7 +250,7 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 
 ---
 
-## 3. `VietnameseInput.test.ts` — Integration (25)
+## 3. `VietnameseInput.test.ts` — Integration (27)
 
 ### 3.1 Singleton lifecycle (2 kịch bản)
 
@@ -285,7 +293,7 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 | Biến camelCase | `const variableName` | không đổi |
 | URL | `see https://abc.com` | không đổi |
 
-### 3.7 `handleInput` — Transform qua DOM (6 kịch bản)
+### 3.7 `handleInput` — Transform qua DOM (8 kịch bản)
 
 | # | Bộ gõ | Input value | Sau xử lý | Rule |
 |---|-------|-------------|-----------|------|
@@ -295,8 +303,10 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 | 4 | VIQR | `baaa(` | `baaă` | `a(` → `ă` |
 | 5 | Telex | `hello` | `hello` | Không đổi (no rule) |
 | 6 | Telex | `baas`, `selectionStart = null` | `baá` | Fallback `cursor = value.length` |
+| 7 | Telex | `div[contenteditable]`, `baas` | `baá` | Transform trên contenteditable |
+| 8 | — | `div` không contenteditable, `baas` | `baas` | Bỏ qua phần tử không editable |
 
-### 3.7 Delegate `processInput` / `applyTone` (5 kịch bản)
+### 3.8 Delegate `processInput` / `applyTone` (5 kịch bản)
 
 | Kịch bản | Gọi | Kết quả |
 |----------|-----|---------|
@@ -306,14 +316,14 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 | Gán tone | `applyTone('ban', 1)` → `'bán'`; `applyTone('bAn', 2)` → `'bàn'` | |
 | Mark hoa | `processInput('Dd')` / `('DD')` → `'Đ'` | |
 
-### 3.8 Known behavior / regression (2 kịch bản)
+### 3.9 Known behavior / regression (2 kịch bản)
 
 | Đầu vào (Telex) | Kết quả | Ghi chú |
 |-----------------|---------|---------|
 | `MIFNH` | `MÌNH` | Viết tắt chữ hoa |
 | `huowng`, `HUOWNG` | `hương`, `HƯƠNG` | ow + normalize |
 
-### 3.9 Cleanup (1 kịch bản)
+### 3.10 Cleanup (1 kịch bản)
 
 | Kịch bản | Assert |
 |----------|--------|
@@ -336,7 +346,7 @@ Tone key **bị loại** khỏi chuỗi; phụ âm sau nguyên âm **được gi
 | Nhóm | Đầu vào | Ghi chú |
 |------|---------|---------|
 | VNI compound | `vieetj5` | `j` không phải phím tone VNI → `việtj` (dùng `vieet5` cho `việt`) |
-| DOM | `contenteditable` | Chưa hỗ trợ — chỉ `input`/`textarea` |
+| DOM | Rich text phức tạp | Chỉ hỗ trợ `contenteditable` đơn giản (text thuần); editor nhiều node/định dạng chưa đầy đủ |
 
 ## 6. Nhánh code chưa cover (không thêm test)
 

@@ -4,6 +4,10 @@ import {
   findVowelPosition,
   shouldRestoreNonViet,
   replaceText,
+  getEditableText,
+  getCaretOffset,
+  isContentEditableElement,
+  isEditableElement,
 } from '../utils/helpers';
 
 describe('isVietnameseWord', () => {
@@ -72,6 +76,47 @@ describe('shouldRestoreNonViet', () => {
   it('returns false for Vietnamese words', () => {
     expect(shouldRestoreNonViet('Tiếng Việt')).toBe(false);
     expect(shouldRestoreNonViet('Xin chao')).toBe(false);
+  });
+});
+
+describe('contenteditable helpers', () => {
+  it('detects contenteditable elements', () => {
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'true');
+    expect(isContentEditableElement(div)).toBe(true);
+    expect(isEditableElement(div)).toBe(true);
+    expect(isEditableElement(document.createElement('span'))).toBe(false);
+  });
+
+  it('getEditableText and replaceText on contenteditable', () => {
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'true');
+    div.innerText = 'hello world';
+    document.body.appendChild(div);
+
+    expect(getEditableText(div)).toBe('hello world');
+    replaceText(div, 'everyone', 6, 11);
+    expect(div.innerText).toBe('hello everyone');
+
+    document.body.removeChild(div);
+  });
+
+  it('getCaretOffset at end of contenteditable', () => {
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'true');
+    div.textContent = 'baas';
+    document.body.appendChild(div);
+
+    const textNode = div.firstChild as Text;
+    const range = document.createRange();
+    range.setStart(textNode, 4);
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+
+    expect(getCaretOffset(div)).toBe(4);
+    document.body.removeChild(div);
   });
 });
 
