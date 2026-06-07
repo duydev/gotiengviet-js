@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   publish:
@@ -25,12 +30,5 @@ jobs:
       - run: npm test
       - run: npm run build
 
-      - name: Verify npm authentication
-        run: npm whoami
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Publish package
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
