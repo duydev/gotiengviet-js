@@ -1,0 +1,39 @@
+---
+description: Core context for gotiengviet-js — Vietnamese IME library goals and constraints
+alwaysApply: true
+---
+
+# gotiengviet-js
+
+TypeScript library adding Vietnamese typing (Telex, VNI, VIQR) to web apps. Zero runtime dependencies.
+
+## Key constraints
+
+- Public API only via `src/index.ts`: `VietnameseInput`, `InputConfig`, `InputMethod`
+- Singleton pattern: `getInstance()` / `destroyInstance()`
+- No new runtime dependencies
+- Docs live in `docs/` (Vietnamese); update there, not root README
+
+## Commands
+
+```bash
+npm run build   # Rollup → dist/
+npm test        # Jest + jsdom
+npm run lint    # ESLint
+npm run format  # Prettier
+```
+
+## Feature task workflow
+
+Orchestrator: `implement-feature-task`. Phase skills: `receive-feature-requirement` → `analyze-feature-tasks` → `track-feature-tasks` → `implement-feature-code` → `run-quality-gate` → `sync-feature-docs` → `gitflow-feature-merge`.
+
+- No PR; merge `feature/*` → `develop` with `--no-ff`
+- Index: `.cursor/skills/README.md`
+
+## Quality gate before merge
+
+```bash
+npm run format && npm run lint && npm test && npm run build
+```
+
+Commits: Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).

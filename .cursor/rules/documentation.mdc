@@ -1,0 +1,33 @@
+---
+description: Documentation conventions for docs/ folder
+globs: docs/**/*.md
+alwaysApply: false
+---
+
+# Documentation
+
+- Language: Vietnamese for `docs/` content
+- Index: `docs/README.md` — keep navigation tables updated
+- Source comments: English
+
+## When changing code, update
+
+| Change | Docs |
+|--------|------|
+| Public API | `docs/api-reference.md` |
+| Input method rules | `docs/input-methods.md` |
+| Architecture | `docs/architecture.md` |
+| Any release | `docs/changelog.md` (`[Unreleased]` section) |
+
+## Do not recreate root docs
+
+All documentation belongs in `docs/`. Root `README.md` is a minimal pointer only.
+
+## GitHub templates
+
+Issue/PR templates live in `docs/github/`. Update there if template content changes.
+
+## Full maintenance
+
+For audit of entire `docs/` folder, use skill `maintain-docs` (see `audit-checklist.md`).
+For single-feature updates, use `sync-feature-docs`.
