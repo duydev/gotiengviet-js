@@ -84,7 +84,10 @@ Chứa dữ liệu tĩnh:
 |-----|----------|
 | `getLastWord(value, position)` | Trích từ cuối tại vị trí con trỏ |
 | `findVowelPosition(text)` | Tìm vị trí các nguyên âm |
-| `replaceText(element, newText, start, end)` | Thay thế đoạn text, giữ vị trí con trỏ |
+| `replaceText(element, newText, start, end)` | Thay thế đoạn text, giữ vị trí con trỏ (`input`, `textarea`, `contenteditable`) |
+| `isEditableElement(element)` | Phát hiện phần tử có thể gõ (input, textarea, contenteditable) |
+| `getEditableText(element)` | Đọc nội dung text từ phần tử editable |
+| `getCaretOffset(element)` | Vị trí con trỏ (selectionStart hoặc Selection API) |
 | `isVietnameseWord(text)` | Kiểm tra chuỗi chỉ chứa ký tự tiếng Việt |
 | `shouldRestoreNonViet(text)` | Phát hiện email, URL, tên biến |
 
@@ -170,7 +173,7 @@ Rollup tạo hai output từ `src/index.ts`:
 
 ## Điểm mở rộng trong tương lai
 
-- Hỗ trợ `contenteditable`
+- Rich text editor phức tạp (nhiều node, định dạng inline) trên `contenteditable`
 - Bộ gõ tùy chỉnh qua config
 - Scope listener theo container thay vì toàn `document`
 - Plugin hook trước/sau transform

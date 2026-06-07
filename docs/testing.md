@@ -88,13 +88,13 @@ describe('processInputByMethod', () => {
 - Trường hợp không đổi (no-op)
 - Hành vi thực tế vs kỳ vọng lý tưởng (document known limitations)
 
-### Bảng test hiện tại (125 cases)
+### Bảng test hiện tại (130 cases)
 
 | File | Số test | Phạm vi chính |
 |------|---------|---------------|
 | `transform.test.ts` | 83 | `applyToneToText`, Telex/VNI/VIQR marks & tones, edge cases |
-| `utils.test.ts` | 16 | `getLastWord`, `findVowelPosition`, `shouldRestoreNonViet`, `replaceText` |
-| `VietnameseInput.test.ts` | 25 | Singleton, config, DOM `handleInput`, skip email/URL/code |
+| `utils.test.ts` | 19 | `getLastWord`, `findVowelPosition`, `shouldRestoreNonViet`, `replaceText`, contenteditable helpers |
+| `VietnameseInput.test.ts` | 27 | Singleton, config, DOM `handleInput`, contenteditable, skip email/URL/code |
 | `utilsIndex.test.ts` | 1 | Re-export smoke |
 
 Chi tiết từng kịch bản (input, expected, mục đích): **[test-scenarios.md](./test-scenarios.md)**.
@@ -135,7 +135,8 @@ Test từng utility function độc lập:
 
 - `getLastWord` — vị trí con trỏ, khoảng trắng, dấu câu
 - `findVowelPosition` — nguyên âm có dấu mũ
-- `replaceText` — giữ caret position, scroll state
+- `replaceText` — giữ caret position, scroll state; hỗ trợ `contenteditable`
+- `isEditableElement`, `getEditableText`, `getCaretOffset` — phát hiện và đọc/ghi phần tử editable
 
 ## Môi trường jsdom
 

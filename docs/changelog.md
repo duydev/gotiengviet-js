@@ -17,6 +17,8 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Hỗ trợ `contenteditable`: `handleInput` và `replaceText` hoạt động trên phần tử có `contenteditable="true"`.
+- Helper DOM: `isEditableElement`, `isContentEditableElement`, `getEditableText`, `getCaretOffset` (dùng nội bộ; `replaceText` mở rộng cho contenteditable).
 - Export công khai `processInputByMethod`, `applyToneToText` (headless transform).
 - Script `npm run quality-gate` — format:check → lint → test → build.
 - CI chạy trên `develop` và `release/**`; thêm bước `format:check`.

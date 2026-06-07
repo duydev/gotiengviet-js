@@ -39,7 +39,7 @@ Dự án ra đời để giải quyết nhu cầu thực tế của người dù
 ### Ngoài phạm vi
 
 - Gõ tiếng Việt trên môi trường Node.js (không có DOM)
-- Hỗ trợ `contenteditable` / rich text editor phức tạp (chưa hỗ trợ đầy đủ)
+- Rich text editor phức tạp trên `contenteditable` (chỉ hỗ trợ text thuần đơn giản)
 - Bộ gõ tùy chỉnh do người dùng định nghĩa (chỉ hỗ trợ 3 bộ gõ cố định)
 - Gợi ý từ, từ điển, hoặc xử lý ngôn ngữ tự nhiên
 

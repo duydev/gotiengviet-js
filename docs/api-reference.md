@@ -222,7 +222,15 @@ Transform **không** chạy khi:
 
 ### Phạm vi element
 
-Chỉ xử lý `event.target` là `HTMLInputElement` hoặc `HTMLTextAreaElement`.
+Xử lý `event.target` khi là một trong các loại sau:
+
+| Loại | Điều kiện |
+|------|-----------|
+| `<input>` | `HTMLInputElement` hoặc object tương thích (có `value`, `selectionStart` / `setRangeText`) |
+| `<textarea>` | `HTMLTextAreaElement` |
+| `contenteditable` | `HTMLElement` với `contenteditable="true"` hoặc `isContentEditable === true` |
+
+Với `contenteditable`, thư viện đọc/ghi qua `innerText` và Selection API để giữ vị trí con trỏ. Rich text editor phức tạp (nhiều node, định dạng inline) **chưa** được hỗ trợ đầy đủ.
 
 ---
 
