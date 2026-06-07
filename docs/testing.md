@@ -10,6 +10,8 @@ Dự án sử dụng **Jest** với môi trường **jsdom** để mô phỏng D
 | Integration test | VietnameseInput + DOM events | `VietnameseInput.test.ts` |
 | Index test | Public exports | `utilsIndex.test.ts` |
 
+**Catalog đầy đủ 120 kịch bản:** [test-scenarios.md](./test-scenarios.md) — bảng input/expected theo từng `describe` block.
+
 ## Chạy test
 
 ```bash
@@ -91,32 +93,21 @@ describe('processInputByMethod', () => {
 | File | Số test | Phạm vi chính |
 |------|---------|---------------|
 | `transform.test.ts` | 82 | `applyToneToText`, Telex/VNI/VIQR marks & tones, edge cases |
-| `utils.test.ts` | ~15 | `getLastWord`, `findVowelPosition`, `replaceText` (+ fallback) |
-| `VietnameseInput.test.ts` | ~20 | Singleton, config, DOM `handleInput` (3 bộ gõ) |
+| `utils.test.ts` | 15 | `getLastWord`, `findVowelPosition`, `replaceText` (+ fallback) |
+| `VietnameseInput.test.ts` | 22 | Singleton, config, DOM `handleInput` (3 bộ gõ) |
 | `utilsIndex.test.ts` | 1 | Re-export smoke |
 
-### Coverage mục tiêu
+Chi tiết từng kịch bản (input, expected, mục đích): **[test-scenarios.md](./test-scenarios.md)**.
 
-Sau mở rộng test (nhánh `feature/maximize-test-coverage`):
+### Coverage hiện tại
 
-| Metric | Trước | Sau |
-|--------|-------|-----|
-| Statements | ~94% | ~96% |
-| Branches | ~77% | ~82% |
-| Lines | ~95% | ~97% |
+| Metric | Giá trị |
+|--------|---------|
+| Statements | ~96% |
+| Branches | ~82% |
+| Lines | ~97% |
 
-Các nhánh còn thiếu chủ yếu ở `transform.ts` (mark revert, tone skip) — khó cover hết mà không thêm fixture phức tạp.
-
-### Known limitations (document trong test)
-
-| Input | Kỳ vọng lý tưởng | Hành vi engine |
-|-------|------------------|----------------|
-| `nguoiwf` (Telex) | `người` | `nguòiw` |
-| `tieengs` | `tiếng` | `tieéng` |
-| `basz` (Telex) | `ba` (bỏ z) | `báz` |
-| VIQR `b'a` | `bá` | không đổi (tone phải sau vowel: `a'`) |
-| VIQR `a^` | `â` | `a` (`^` là tone revert) |
-| VNI `dd1` | `đ` + tone | `dd1` (cần `d9` trước) |
+Các nhánh chưa cover và known limitations: xem [mục 5–6 trong test-scenarios.md](./test-scenarios.md#5-known-limitations-tổng-hợp).
 
 ### 2. Integration tests (`VietnameseInput.test.ts`)
 

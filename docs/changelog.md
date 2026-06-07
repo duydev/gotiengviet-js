@@ -9,6 +9,7 @@ dự án tuân theo [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Tài liệu `docs/test-scenarios.md` — catalog đầy đủ 120 kịch bản test (input, expected, mục đích, known limitations).
 - Mở rộng test suite: 34 → 120 test cases; coverage ~96% statements / ~82% branches.
 - Test `transform.test.ts`: Telex/VNI/VIQR đầy đủ, `applyToneToText`, edge cases và known limitations.
 - Test `utils.test.ts`: fallback `replaceText`, khôi phục `scrollTop`.
