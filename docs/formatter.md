@@ -1,10 +1,10 @@
 # Formatter (Prettier)
 
-Dự án dùng **Prettier 3** làm formatter chuẩn cho mã TypeScript. ESLint enforce format qua `eslint-plugin-prettier` — vi phạm format = lỗi lint.
+Dự án dùng **Prettier 3** làm formatter chuẩn. ESLint enforce format qua `eslint-plugin-prettier`.
 
 ## Cấu hình
 
-File `.prettierrc`:
+### `.prettierrc`
 
 ```json
 {
@@ -12,135 +12,95 @@ File `.prettierrc`:
   "trailingComma": "all",
   "singleQuote": true,
   "printWidth": 80,
-  "tabWidth": 2
+  "tabWidth": 2,
+  "endOfLine": "lf"
 }
 ```
 
 | Option | Giá trị | Ý nghĩa |
 |--------|---------|---------|
-| `semi` | `true` | Luôn có dấu chấm phẩy cuối câu lệnh |
-| `trailingComma` | `all` | Dấu phẩy cuối trong object/array multiline |
-| `singleQuote` | `true` | Chuỗi dùng nháy đơn `'` |
-| `printWidth` | `80` | Xuống dòng khi vượt 80 ký tự |
+| `semi` | `true` | Dấu chấm phẩy cuối câu lệnh |
+| `trailingComma` | `all` | Trailing comma multiline |
+| `singleQuote` | `true` | Nháy đơn `'` |
+| `printWidth` | `80` | Xuống dòng tại 80 ký tự |
 | `tabWidth` | `2` | Indent 2 spaces |
+| `endOfLine` | `lf` | Unix line ending (tránh CRLF trên Windows) |
+
+### File hỗ trợ
+
+| File | Vai trò |
+|------|---------|
+| `.prettierignore` | Bỏ qua `dist/`, `node_modules/`, `coverage/` |
+| `.editorconfig` | Editor dùng LF + indent 2 |
+| `.gitattributes` | Git normalize `eol=lf` |
 
 ## Lệnh
 
 ```bash
-# Format toàn bộ source TypeScript
+# Format và ghi file
 npm run format
 
-# Tương đương
-npx prettier --write "src/**/*.ts"
-
-# Kiểm tra không format (dùng trong CI tùy chọn)
-npx prettier --check "src/**/*.ts"
+# Chỉ kiểm tra (không ghi) — dùng CI hoặc verify
+npm run format:check
 ```
-
-**Lưu ý:** `npm run format` chỉ format `src/**/*.ts`, không format `docs/`, `rollup.config.js`, v.v.
 
 ## Phạm vi format
 
-| Được format | Không tự động format |
-|-------------|----------------------|
-| `src/**/*.ts` | `docs/**/*.md` |
-| (qua lint-staged khi commit) | `rollup.config.js`, `*.json` |
+| Script | Phạm vi |
+|--------|---------|
+| `npm run format` | `src/**/*.ts` |
+| lint-staged (pre-commit) | `*.ts` staged |
 
-Format file ngoài `src/` thủ công:
+Format thủ công file khác:
 
 ```bash
 npx prettier --write "rollup.config.js"
-npx prettier --write "docs/**/*.md"
 ```
 
 ## Tích hợp ESLint
-
-Prettier không chạy độc lập trong CI — ESLint báo lỗi format:
-
-```
-error  Delete `··`  prettier/prettier
-```
-
-Sửa bằng `npm run format` hoặc `eslint --fix`.
-
-Thứ tự extends trong `.eslintrc.json`:
 
 ```
 eslint:recommended → @typescript-eslint/recommended → prettier
 ```
 
-`eslint-config-prettier` tắt ESLint rules xung đột với Prettier.
+`prettier/prettier: error` — format sai = lint fail.
 
-## Pre-commit (lint-staged)
+Sửa nhanh:
 
-Hook Husky gọi lint-staged. Khuyến nghị config:
+```bash
+npm run format && npm run lint
+```
+
+## Pre-commit
 
 ```json
-{
-  "lint-staged": {
-    "*.ts": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  }
+"lint-staged": {
+  "*.ts": ["eslint --fix", "prettier --write"]
 }
 ```
 
-Thứ tự: ESLint fix trước, Prettier ghi file sau.
+Thứ tự: ESLint fix → Prettier write.
 
-## Ví dụ trước/sau format
-
-```typescript
-// ❌ Trước
-const x={a:1,b:2}
-import {VietnameseInput} from "./core/VietnameseInput"
-
-// ✅ Sau
-const x = { a: 1, b: 2 };
-import { VietnameseInput } from './core/VietnameseInput';
-```
-
-## IDE
-
-### VS Code / Cursor
-
-Cài extension **Prettier**. Tùy chọn format on save:
+## IDE (VS Code / Cursor)
 
 ```json
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
+  "files.eol": "\n",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
 ```
 
-Khi bật ESLint fix on save, có thể tắt `formatOnSave` cho TypeScript để tránh xung đột — ESLint + Prettier plugin đã đủ.
+Khuyến nghị dùng ESLint fix on save thay vì format on save riêng — tránh double-format.
 
 ## Quy trình hàng ngày
 
 ```bash
-# Trước commit
 npm run format
 npm run lint
-
-# Hoặc một lệnh (nếu đã có lint-staged config)
-git add .
-git commit -m "feat: ..."
-# → Husky tự format + lint file staged
-```
-
-## Không format thủ công
-
-Prettier ít khi cần ignore. Nếu bắt buộc:
-
-```typescript
-// prettier-ignore
-const matrix = [
-  1, 0,
-  0, 1,
-];
+# hoặc để Husky lint-staged tự chạy khi commit
 ```
 
 ## Tài liệu liên quan

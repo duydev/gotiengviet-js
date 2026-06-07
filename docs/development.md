@@ -25,8 +25,10 @@ Hook `prepare` sẽ tự chạy `npm run build` sau `npm install`.
 | `npm run build` | Xóa `dist/`, build UMD + ESM qua Rollup |
 | `npm test` | Chạy Jest (jsdom) |
 | `npm run test:coverage` | Test kèm báo cáo coverage |
-| `npm run lint` | ESLint trên `*.ts` |
-| `npm run format` | Prettier format `src/**/*.ts` |
+| `npm run lint` | ESLint trên `src/**/*.ts` |
+| `npm run lint:fix` | ESLint `--fix` trên `src/**/*.ts` |
+| `npm run format` | Prettier write `src/**/*.ts` |
+| `npm run format:check` | Prettier check (không ghi file) |
 | `npm run clean` | Xóa thư mục `dist/` |
 | `npm run serve` | Static server cho demo (`example/`) |
 

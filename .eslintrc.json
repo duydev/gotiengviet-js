@@ -1,6 +1,10 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
   "plugins": ["@typescript-eslint", "prettier"],
   "extends": [
     "eslint:recommended",
@@ -9,10 +13,19 @@
   ],
   "rules": {
     "prettier/prettier": "error",
-    "no-console": "warn"
+    "no-console": "warn",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-explicit-any": "warn"
   },
   "env": {
+    "browser": true,
     "node": true,
-    "jest": true
-  }
+    "jest": true,
+    "es2018": true
+  },
+  "ignorePatterns": ["dist/", "node_modules/", "coverage/"]
 }

@@ -13,8 +13,8 @@ Phase 5 of `docs/feature-workflow.md`. **All four must pass** before commit/merg
 ## Commands (in order)
 
 ```bash
-npm run format
-npm run lint
+npm run format        # hoặc format:check để verify only
+npm run lint          # hoặc lint:fix để auto-fix
 npm test
 npm run build
 ```
@@ -24,6 +24,8 @@ One-liner:
 ```bash
 npm run format && npm run lint && npm test && npm run build
 ```
+
+Pre-commit: Husky → lint-staged (`eslint --fix` + `prettier --write` trên `*.ts` staged).
 
 ## On failure
 

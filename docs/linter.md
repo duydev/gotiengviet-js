@@ -9,6 +9,8 @@ Dự án dùng **ESLint 8** kết hợp **@typescript-eslint** và **eslint-plug
 | `.eslintrc.json` | Rules chính |
 | `.eslintignore` | File/thư mục bỏ qua |
 | `.prettierrc` | Prettier (ESLint enforce qua plugin) |
+| `.editorconfig` | Đồng bộ editor (LF, indent) |
+| `.gitattributes` | Chuẩn hóa line ending trong Git |
 
 ### Rules hiện tại
 
@@ -21,34 +23,37 @@ Dự án dùng **ESLint 8** kết hợp **@typescript-eslint** và **eslint-plug
   ],
   "rules": {
     "prettier/prettier": "error",
-    "no-console": "warn"
-  }
+    "no-console": "warn",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-explicit-any": "warn"
+  },
+  "env": { "browser": true, "node": true, "jest": true, "es2018": true }
 }
 ```
 
 | Rule | Mức | Ý nghĩa |
 |------|-----|---------|
 | `eslint:recommended` | error | Lỗi JavaScript cơ bản |
-| `@typescript-eslint/recommended` | error | Lỗi TypeScript (unused vars, any, ...) |
+| `@typescript-eslint/recommended` | error | Lỗi TypeScript |
 | `prettier/prettier` | error | Vi phạm format Prettier = lỗi lint |
-| `no-console` | warn | Cảnh báo khi dùng `console.log` |
+| `no-console` | warn | Cảnh báo `console.log` |
+| `no-unused-vars` | error | Cho phép prefix `_` cho biến cố ý không dùng |
+| `no-explicit-any` | warn | Cảnh báo khi dùng `any` |
 
-### Môi trường
+### Parser
 
 ```json
-"env": { "node": true, "jest": true }
+"parserOptions": { "ecmaVersion": 2018, "sourceType": "module" }
 ```
-
-Cho phép biến global của Node.js và Jest trong test.
 
 ## Lệnh
 
 ```bash
-# Lint toàn bộ file .ts
+# Lint src/
 npm run lint
 
-# Tương đương
-npx eslint . --ext .ts
+# Lint + tự sửa (eslint --fix + prettier qua plugin)
+npm run lint:fix
 ```
 
 Lint chạy trong:
@@ -59,88 +64,62 @@ Lint chạy trong:
 
 ## Phạm vi kiểm tra
 
-- Tất cả file `*.ts` trong project
-- Bao gồm `src/` và `src/__tests__/`
-- Loại trừ theo `.eslintignore` (thường là `dist/`, `node_modules/`)
+- `src/**/*.ts` (source + tests)
+- Loại trừ: `dist/`, `node_modules/`, `coverage/` (`.eslintignore` + `ignorePatterns`)
 
 ## Sửa lỗi lint
 
-### Tự động (format)
+### Tự động
 
-Nhiều lỗi `prettier/prettier` sửa được bằng format:
+```bash
+npm run format      # Sửa lỗi prettier/prettier (CRLF, spacing...)
+npm run lint:fix    # ESLint --fix
+```
+
+### Lỗi CRLF (Windows)
+
+Dự án dùng **LF** (`endOfLine: "lf"`). Nếu gặp `Delete ␍`:
 
 ```bash
 npm run format
 ```
 
-### Thủ công
-
-1. Đọc output ESLint — mỗi dòng ghi file, dòng, rule
-2. Sửa theo gợi ý hoặc [TypeScript ESLint rules](https://typescript-eslint.io/rules/)
-3. Chạy lại `npm run lint`
-
-### Ví dụ lỗi thường gặp
-
-```typescript
-// ❌ @typescript-eslint/no-unused-vars
-const unused = 'x';
-
-// ✅ Xóa hoặc dùng biến
-const used = getValue();
-
-// ❌ no-console
-console.log('debug');
-
-// ✅ Dùng trong test hoặc xóa; tránh trong production code
-```
+File `.editorconfig` và `.gitattributes` giúp editor/Git giữ LF.
 
 ## Lint-staged (pre-commit)
 
-Hook `.husky/pre-commit` chạy `npx lint-staged` trước mỗi commit.
+Hook `.husky/pre-commit` → `npx lint-staged`.
 
-**Khuyến nghị** thêm cấu hình vào `package.json`:
+Config trong `package.json`:
 
 ```json
 {
   "lint-staged": {
-    "*.ts": [
-      "eslint --fix",
-      "prettier --write"
-    ]
+    "*.ts": ["eslint --fix", "prettier --write"]
   }
 }
 ```
 
-Hiện tại `lint-staged` đã cài nhưng chưa có block config — pre-commit có thể không lint file staged. Thêm config trên để kích hoạt đầy đủ.
+Chỉ lint/format file **staged** — nhanh hơn lint toàn project.
 
 ## Tích hợp IDE
 
 ### VS Code / Cursor
-
-Cài extension **ESLint**. Thêm vào `.vscode/settings.json` (tùy chọn):
 
 ```json
 {
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": ["typescript"]
+  "eslint.validate": ["typescript"],
+  "files.eol": "\n"
 }
 ```
 
-## Khi thêm rule mới
-
-1. Sửa `.eslintrc.json`
-2. Chạy `npm run lint` trên toàn project
-3. Sửa vi phạm hoặc `npm run format` nếu là lỗi Prettier
-4. Commit: `chore: them eslint rule ...`
-
 ## Quality gate
 
-Linter là bước bắt buộc trước merge vào `develop`:
-
 ```bash
-npm run lint && npm test && npm run build
+npm run format && npm run lint && npm test && npm run build
 ```
 
 ## Tài liệu liên quan
