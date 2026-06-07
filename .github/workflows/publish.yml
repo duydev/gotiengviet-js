@@ -30,5 +30,19 @@ jobs:
       - run: npm test
       - run: npm run build
 
+      - name: Verify npm authentication
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::NPM_TOKEN secret chưa được cấu hình."
+            echo "Tạo Automation token tại https://www.npmjs.com/settings/duydev/tokens"
+            echo "rồi thêm vào GitHub: Settings → Secrets → NPM_TOKEN"
+            exit 1
+          fi
+          npm whoami
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish package
         run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
