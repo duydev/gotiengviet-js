@@ -1,0 +1,38 @@
+---
+description: Layered architecture and TypeScript conventions for gotiengviet-js source
+globs: src/**/*.ts
+alwaysApply: false
+---
+
+# Architecture
+
+| File | Responsibility |
+|------|----------------|
+| `src/core/VietnameseInput.ts` | DOM events, singleton, runtime API |
+| `src/core/transform.ts` | Pure string transform — **no DOM** |
+| `src/utils/helpers.ts` | Word extraction, vowel detection, `replaceText` |
+| `src/constants.ts` | `INPUT_METHODS`, `VIETNAMESE_CHARS` |
+| `src/types.ts` | Type definitions |
+| `src/index.ts` | Public exports only |
+
+## Rules
+
+- Transform logic stays in `transform.ts` as pure functions (string in → string out)
+- DOM/caret handling only in `VietnameseInput.ts` and `utils/helpers.ts`
+- Re-export helpers via `src/utils/index.ts`
+- Bind event handlers once in constructor
+- Skip transform during `composition` events
+
+## Style
+
+- TypeScript strict; single quotes, semicolons, 80 cols (Prettier)
+- No `console.log` (ESLint warns)
+- `processInput` / `applyTone` are legacy shims — preserve if refactoring internals
+
+## Common changes
+
+| Task | Files |
+|------|-------|
+| Input method rules | `constants.ts` + `transform.test.ts` |
+| Transform logic | `transform.ts` + `transform.test.ts` |
+| Public API | `index.ts`, `VietnameseInput.ts`, `docs/api-reference.md` |
